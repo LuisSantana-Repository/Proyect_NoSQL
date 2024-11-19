@@ -12,7 +12,7 @@ def set_schema(client):
         follows
         mongo
         blocked
-        senr_message
+        sent_message
         follow_request
     }
     type Message {
@@ -33,4 +33,241 @@ def set_schema(client):
     """
     return client.alter(pydgraph.Operation(schema=schema))
 
-def createUser(client,name,)
+
+def createUser(client,username, mongo):
+    txn = client.txn()
+    try:
+        p = {
+            'set': [
+                # User data
+                {
+                    'uid': '_:user1',
+                    'dgraph.type': 'User',
+                    'username': username,
+                    'mongo': mongo,
+                }
+            ]
+        }
+        response = txn.mutate(set_obj=p)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+        print(f"UIDs: {response.uids}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+
+def createMessage(client,receiver, mssage, sender):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        p = {
+            'set': [
+                # User data
+                {
+                    'uid': sender,
+                    'sent_message':[{
+                        'uid': '_:new_message',
+                        'dgraph.type': 'Message',
+                        'content': mssage,
+                        'timestamp': datetime.datetime.utcnow().isoformat(),
+                        'receiver': {'uid': receiver}
+                        }]
+                }
+            ]
+        }
+        response = txn.mutate(set_obj=p)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+        print(f"UIDs: {response.uids}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+def sent_friend_request(client, user, friend):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        p = {
+            'set': [
+                # User data
+                {
+                    'uid': user,
+                    'follow_request':[{
+                            'uid': friend
+                        }]
+                }
+            ]
+        }
+        response = txn.mutate(set_obj=p)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+        print(f"UIDs: {response.uids}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+
+def reject_friend_request(client, user, friend):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        p = {
+            'delete': [
+                # User data
+                {
+                    'uid': user,
+                    'follow_request':[{
+                            'uid': friend
+                        }]
+                }
+            ]
+        }
+        response = txn.mutate(set_obj=p)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+        print(f"UIDs: {response.uids}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+
+def accept_friend_request(client, user, friend):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        delete_mutation = {
+            'delete': [
+                {
+                    'uid': user,
+                    'follow_request': [{'uid': friend}]
+                }
+            ]
+        }
+        txn.mutate(set_obj=delete_mutation)
+        
+        set_mutation = {
+            'set': [
+                {
+                    'uid': user,
+                    'blocked': [{'uid': friend}]
+                },
+                {
+                    'uid': friend,
+                    'follows': [{'uid': user}]
+                }
+            ]
+        }
+        txn.mutate(set_obj=set_mutation)
+        
+        # p = {
+        #     'delete': [
+        #         # User data
+        #         {
+        #             'uid': user,
+        #             'follow_request':[{
+        #                     'uid': friend
+        #                 }]
+        #         }
+        #     ],
+        #     'set':
+        #         # User data
+        #         {
+        #             'uid': user,
+        #             'follows':[{
+        #                     'uid': friend
+        #                 }]
+        #         },
+        #     'set':
+        #         {
+        #             'uid': friend,
+        #             'follows':[{
+        #                     'uid': user
+        #                 }]
+        #         },
+        # }
+        # response = txn.mutate(set_obj=p)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+def unfollow_friend(client, user, friend):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        mutation = {
+            'set': [
+                {
+                    'uid': user,
+                    'follow': [{'uid': friend}]
+                },
+                {
+                    'uid': friend,
+                    'follow': [{'uid': user}]
+                }
+            ]
+        }
+        txn.mutate(set_obj=mutation)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+
+def block(client, user, bloqued):
+    txn = client.txn()
+    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    try:
+        delete_mutation = {
+            'set': [
+                {
+                    'uid': user,
+                    'blocked': [{'uid': bloqued}]
+                }
+            ]
+        }
+        txn.mutate(set_obj=delete_mutation)
+        commit_response = txn.commit()
+        print(f"Commit Response: {commit_response}")
+    finally:
+        # Clean up. 
+        # Calling this after txn.commit() is a no-op and hence safe.
+        txn.discard()
+
+
+def get_user_uid_by_mongo(client, mongo_id):
+    query ="""query findUser($mongo: string) {
+            user(func: eq(mongo, $mongo)) {
+                uid
+            }
+        }"""
+    variables = {'$mongo': mongo_id}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    users = data.get('users', [])
+    return users[0]['uid'] if users else None
+
+def get_my_friends(client, user):
+    query ="""query findFriends($uid: string) {
+            user(func: uid($uid)) {
+                friend_count: count(follows)
+                follows{
+                    uid
+                    username
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"Firends:\n{json.dumps(data, indent=2)}")
+    return data
