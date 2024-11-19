@@ -6,7 +6,6 @@ import random
 import uuid
 import time_uuid
 from cassandra.query import BatchStatement
-import pydgraph
 
 
 #cassandra
@@ -93,32 +92,3 @@ CREATE_COMMENTS_COUNT = """
 
 
 
-#DGraph
-
-def set_schema(client):
-    schema = """
-    type User {
-        username
-        follows
-        mongo
-        blocked
-        senr_message
-        follow_request
-    }
-    type Message {
-    content: string
-    timestamp: datetime
-    receiver: uid
-    }
-    receiver: uid @reversed
-    content: string .
-    timestamp: datetime .
-    receiver: uid .
-    username: string @index(fulltext) .
-    follows: [uid] .
-    blocked: [uid] @reverse .
-    sent_message: [uid] @reverse .
-    follow_request: [uid] @reverse .
-    mongo: string @index(hex) .
-    """
-    return client.alter(pydgraph.Operation(schema=schema))
