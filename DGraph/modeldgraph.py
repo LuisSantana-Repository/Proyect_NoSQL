@@ -271,3 +271,115 @@ def get_my_friends(client, user):
     data = json.loads(res.json)
     print(f"Firends:\n{json.dumps(data, indent=2)}")
     return data
+
+def get_blocked_Users(client, user):
+    query ="""query BLockedUsers($uid: string) {
+            Blocked(func: uid($uid)) {
+                uid
+                blocked {
+                    uid
+                    username
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"Blocked:\n{json.dumps(data, indent=2)}")
+    return data
+
+def get_blockedBy(client, user):
+    query ="""query blockedBy($uid: string) {
+            blockedBy(func: uid($uid)) {
+                uid
+                ~blocked {
+                    uid
+                    username
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"Blocked:\n{json.dumps(data, indent=2)}")
+    return data
+
+
+def get_myMessages(client, user):
+    query ="""query mySendedMessages ($uid: string) {
+            mySendedMessages (func: uid($uid)) {
+                uid
+                username
+                sent_message {
+                    uid
+                    content
+                    timestamp
+                    receiver {
+                        uid
+                        username
+                    }
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"My Messages:\n{json.dumps(data, indent=2)}")
+    return data
+
+def get_RecivedMessages(client, user):
+    query ="""query myRecivedMessages ($uid: string) {
+            myRecivedMessages (func: uid($uid)) {
+                uid
+                username
+                ~receiver {
+                    uid
+                    content
+                    timestamp
+                    sender: ~sent_message {
+                        uid
+                        username
+                    }
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"My Recived Messages:\n{json.dumps(data, indent=2)}")
+    return data
+
+
+def get_SendFollowRequest(client, user):
+    query ="""query MyFollowRequest ($uid: string) {
+            MyFollowRequest (func: uid($uid)) {
+                uid
+                username
+                ~follow_request{
+                    uid
+                    username
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"My Sended Follow Request:\n{json.dumps(data, indent=2)}")
+    return data
+
+def get_RecieveFollowRequest(client, user):
+    query ="""query PendingRequest ($uid: string) {
+            PendingRequest (func: uid($uid)) {
+                uid
+                username
+                follow_request{
+                    uid
+                    username
+                }
+            }
+        }"""
+    variables = {'$uid': user}
+    res = client.txn(read_only=True).query(query, variables=variables)
+    data = json.loads(res.json)
+    print(f"My Pending Follow Request:\n{json.dumps(data, indent=2)}")
+    return data
