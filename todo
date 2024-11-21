@@ -8,7 +8,7 @@
 - Add/Update preferences (mongo)
 - Postear (Cassandra)
 - Comentar post (Cassandra)
-- Ver tu feed (Cassandra, mongo y dgraph)
+- Ver tu feed (Cassandra y dgraph)
 - Buscar usuarios por nombre o tags (mongo)
 - Ver los posts de un usuario (mongo y Cassandra)
 - Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra)
