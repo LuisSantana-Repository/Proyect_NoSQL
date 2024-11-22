@@ -1,0 +1,37 @@
+1 - Create schema
+2 - Bulk insert (not necessary)
+
+3 - Acciones de usuario:
+- Register (mongo)
+- Log In (mongo y Cassandra)
+- Modify Profile information (mongo)
+- Add/Update preferences (mongo)
+- Postear (Cassandra)
+- Comentar post (Cassandra)
+- Ver tu feed (Cassandra y dgraph)
+- Buscar usuarios por nombre o tags (mongo)
+- Ver los posts de un usuario (mongo y Cassandra)
+- Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra)
+- Reportar posts (mongo)
+- Guardar posts (mongo)
+- Ver notificaciones (mongo)
+- Enviar follow requests (dgraph y mongo)
+- Aceptar/rechazar follow requests (dgraph y mongo)
+- Unfollow (dgraph)
+- Bloquear (dgraph)
+- Desbloquear (dgraph)
+- Mensajes "privados" (dgraph)
+- Ver amigos (dgraph)
+- Descubrir posibles amigos (dgraph)
+
+4 - Acciones de analisis:
+- Posts con mas likes (Cassandra)
+- Posts con mas comentarios (Cassandra)
+- Posts con mas reportes (Cassandra y mongo)
+- Topics mas usados (Cassandra)
+- Hashtags mas usados (Cassandra)
+- User growth (mongo)
+- Logins de usuarios (Cassandra)
+
+5 - Delete
+6 - Exit
