@@ -242,7 +242,7 @@ def get_dailyActivityes(session, user_id):
     rows = session.execute(query, (user_id, today, tomorrow))
     return list(rows)
 
-def get_populatTopics(session, limit=10):
+def get_popularTopics(session, limit=10):
     query = session.prepare("""
         SELECT topic, usage_count
         FROM Topics
@@ -253,7 +253,7 @@ def get_populatTopics(session, limit=10):
     return list(rows)
 
 
-def get_populatHashtags(session, limit=10):
+def get_popularHashtags(session, limit=10):
     query = session.prepare("""
         SELECT hashtag, usage_count
         FROM Hashtags
@@ -262,3 +262,18 @@ def get_populatHashtags(session, limit=10):
     """)
     rows = session.execute(query, (limit))
     return list(rows)
+
+def create_keyspace(session, keyspace, replication_factor):
+    session.execute(CREATE_KEYSPACE.format(keyspace, replication_factor))
+
+def create_schema(session):
+    session.execute(CREATE_POST_BY_USER)
+    session.execute(CREATE_POST_BY_TOPIC)
+    session.execute(CREATE_POST_BY_PARENT)
+    session.execute(CREATE_POST_LIKES)
+    session.execute(CREATE_COMMENTS_COUNT)
+    session.execute(CREATE_LOGIN_USER)
+    session.execute(CREATE_LOGIN_DATE)
+    session.execute(CREATE_ACTIVITY_TABLE)
+    session.execute(CREATE_TOPIC_TABLE)
+    session.execute(CREATE_HASHTAGS_TABLE)
