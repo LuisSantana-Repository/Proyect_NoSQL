@@ -383,3 +383,6 @@ def get_RecieveFollowRequest(client, user):
     data = json.loads(res.json)
     print(f"My Pending Follow Request:\n{json.dumps(data, indent=2)}")
     return data
+
+def delete_all(client):
+    client.alter(pydgraph.Operation(drop_all=True))

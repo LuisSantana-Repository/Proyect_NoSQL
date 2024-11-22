@@ -277,3 +277,15 @@ def create_schema(session):
     session.execute(CREATE_ACTIVITY_TABLE)
     session.execute(CREATE_TOPIC_TABLE)
     session.execute(CREATE_HASHTAGS_TABLE)
+
+def delete_all(session):
+    try:
+        # Select all table names within the keyspace
+        query = f"SELECT table_name FROM system_schema.tables WHERE keyspace_name='socialmedia'"
+        rows = session.execute(query)
+        table_names = [row.table_name for row in rows]    
+        # Drop each table
+        for table_name in table_names:
+            session.execute(f"DROP TABLE {table_name}")    
+    except Exception as e:
+        return

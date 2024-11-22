@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 from Cassandra import cmodel
 from DGraph import dmodel
+from Mongodb import MongoFuncs
 
 # Cassandra Connection
 CLUSTER_IPS = os.getenv('CASSANDRA_CLUSTER_IPS', 'localhost')
@@ -220,7 +221,12 @@ def main():
                 except Exception as e:
                     print(f"An error occurred: {e}")
             elif option == 5:
-                # Delete all data
+                # Cassandra
+                cmodel.delete_all(session)
+                # Mongo
+                MongoFuncs.delete_all(db)
+                # Dgraph
+                dmodel.delete_all(client)
                 pass
             elif option == 6:
                 # Cassandra doesnt need to be closed?

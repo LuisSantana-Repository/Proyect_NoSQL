@@ -147,3 +147,11 @@ def get_noficitation(db, user_id):
 def pop_noficitation(db, user_id):
     result = db.notifications.find_one_and_delete({"user_id": user_id}, sort=[("timestamp", 1)])
     return result
+
+def delete_all(db):
+    try:
+        collection_names = db.list_collection_names()
+        for collection_name in collection_names:
+            db[collection_name].drop()
+    except Exception as e:
+        return
