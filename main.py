@@ -14,7 +14,7 @@ REPLICATION_FACTOR = os.getenv('CASSANDRA_REPLICATION_FACTOR', '1')
 
 # Mongo Connection
 MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
-DB_NAME = os.getenv('MONGODB_DB_NAME', 'iteso')
+DB_NAME = os.getenv('MONGODB_DB_NAME', 'socialmedia')
 
 # Dgraph Connection
 DGRAPH_URI = os.getenv('DGRAPH_URI', 'localhost:9080')
@@ -92,8 +92,7 @@ def main():
 
     # Initialize Mongo
     mongodb_client = MongoClient(MONGODB_URI)
-    database = mongodb_client[DB_NAME]
-    collection = database['socialmedia']
+    db = mongodb_client[DB_NAME]
     
     # Initialize Client Stub and Dgraph Client
     client_stub = create_client_stub()
