@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pymongo import MongoClient
-from model import User, Report, Notification
+from mmodel import User, Report, Notification
 from bson import ObjectId
 client = MongoClient("mongodb://localhost:27017/")
 db = client['iteso']

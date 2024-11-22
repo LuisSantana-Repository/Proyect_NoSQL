@@ -2,11 +2,9 @@
 import os
 import pydgraph
 from cassandra.cluster import Cluster
-from fastapi import FastAPI
 from pymongo import MongoClient
 
 from Cassandra import cmodel
-from Mongodb import mmodel
 from DGraph import dmodel
 
 # Cassandra Connection
@@ -16,8 +14,7 @@ REPLICATION_FACTOR = os.getenv('CASSANDRA_REPLICATION_FACTOR', '1')
 
 # Mongo Connection
 MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
-DB_NAME = os.getenv('MONGODB_DB_NAME', 'socialmedia')
-app = FastAPI()
+DB_NAME = os.getenv('MONGODB_DB_NAME', 'iteso')
 
 # Dgraph Connection
 DGRAPH_URI = os.getenv('DGRAPH_URI', 'localhost:9080')
@@ -94,8 +91,9 @@ def main():
     session.set_keyspace(KEYSPACE)
 
     # Initialize Mongo
-    app.mongodb_client = MongoClient(MONGODB_URI)
-    app.database = app.mongodb_client[DB_NAME]
+    mongodb_client = MongoClient(MONGODB_URI)
+    database = mongodb_client[DB_NAME]
+    collection = database['socialmedia']
     
     # Initialize Client Stub and Dgraph Client
     client_stub = create_client_stub()
@@ -108,11 +106,10 @@ def main():
             if option == 1:
                 # Cassandra model
                 cmodel.create_schema(session)
-                # Mongo model
+                # Mongo doesnt need to set the model
 
                 # Dgraph model
                 dmodel.set_schema(client)
-                pass
             elif option == 2:
                 # Load random data (not necessary)
                 pass
@@ -227,7 +224,8 @@ def main():
                 # Delete all data
                 pass
             elif option == 6:
-                app.mongodb_client.close()
+                # Cassandra doesnt need to be closed?
+                mongodb_client.close() # Close Mongo
                 close_client_stub(client_stub) # Close Dgraph
                 break
             else:
