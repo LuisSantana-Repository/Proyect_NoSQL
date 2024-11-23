@@ -20,6 +20,8 @@ DB_NAME = os.getenv('MONGODB_DB_NAME', 'socialmedia')
 
 # Dgraph Connection
 DGRAPH_URI = os.getenv('DGRAPH_URI', 'localhost:9080')
+
+# Functions
 def choose_category():
     categories = ["Action", "Fantasy", "Theory", "Adventure", "Comedy", "Drama", "Mystery", "Horror"]
     print("Available categories:")
@@ -143,7 +145,6 @@ def main():
                 # Cassandra model
                 cmodel.create_schema(session)
                 # Mongo doesnt need to set the model
-
                 # Dgraph model
                 dmodel.set_schema(client)
             elif option == 2:
@@ -154,7 +155,7 @@ def main():
                 option = int(input("Enter your choice: "))
                 try:
                     if option == 1:
-                        # Code to handle "Register"
+                        # Register
                         username = input("Enter Username> ")
                         email = input("Enter email> ")
                         password = input("Enter password> ")
@@ -166,7 +167,7 @@ def main():
                         ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                         cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 2:
-                        # Code to handle "Log In"
+                        # Log In
                         email = input("Enter email> ")
                         password = input("Enter password> ")
                         mongo_user_id = MongoFuncs.get_Log_In(db,email,password)
@@ -177,22 +178,22 @@ def main():
                         ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                         cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 3 and mongo_user_id:
-                        # Code to handle "Modify Profile Information"
-                        # question new bie
+                        # Modify Profile Information
+                        # question new bio
                         
                         # question new social profiles
                         
                         # question new name 
                         pass
                     elif option == 4 and mongo_user_id:
-                        # Code to handle "Add/Update Preferences"
+                        # Add/Update Preferences
                         preferences = choose_category()
                         lenguage = choose_languages()
                         tags = get_hashtags()
                         # privacity setting
                         pass
                     elif option == 5 and mongo_user_id:
-                        # Code to handle "Post"
+                        # Post
                         post = input("Write your post here >")
                         hashtags = get_hashtags()
                         categoty = choose_category()
@@ -201,85 +202,85 @@ def main():
                         cmodel.insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,None)
                         pass
                     elif option == 6 and mongo_user_id:
-                        #get posts to choose who to comment
+                        # Comment Post
+                        #get posts to choose who to comment // No, solo envia el commentario a un post id, supones que ya sabe el post id al que quiere comentar
                         
                         #do option 5 but change parent to the post 
-                        # Code to handle "Comment on Posts"
                         pass
                     elif option == 7 and mongo_user_id:
-                        # Code to handle "View Your Feed"
+                        # View Your Feed
                             #list post to chose from   
-                            # menu (To decide if like or not like)
+                            # menu (To decide if like or not like) // No, solo muestra los posts de la gente que sigue
                         pass
                     elif option == 8 and mongo_user_id:
-                        # Code to handle "Search for Users by Name or Tags"
+                        # Search for Users by Name or Tags
                         input("Name or tag>")
                         #have the serch user by name or tag but missing the privasity notification or the block feature
                         #MongoFuncs.get_users_by_name
                         #MongoFuncs.get_users_by_tag
                         pass
                     elif option == 9 and mongo_user_id:
-                        # Code to handle "View a User's Posts"
-                        #lists of users or decide myself
+                        # View a User's Posts
+                        #lists of users or decide myself // No, solo inserta el user id y muestra sus posts
                         
                         #cmodel.get_post_by_user
                         pass
                     elif option == 10 and mongo_user_id:
-                        # Code to handle "Discover Posts"
+                        # Discover Posts
                         #do cpsot by each ppreference anf do a join
                         pass
                     elif option == 11 and mongo_user_id: 
-                        # Code to handle "Report Posts"
+                        # Report Posts
                         #list post or input post id
                         reson = input("Reson of report >")
                         pass
                     elif option == 12 and mongo_user_id:
-                        # Code to handle "Save Posts"
+                        # Save Posts
                         
-                        #list post or input post id
+                        # input post id
                         
                         #also a way to see my saved post is needed
                         pass
                     elif option == 13 and mongo_user_id:
-                        # Code to handle "View Notifications"
+                        # View Notifications
                         print(MongoFuncs.get_noficitation(db,mongo_user_id))
                         pass
                     elif option == 14 and mongo_user_id:
-                        # Code to handle "Send Follow Requests"
+                        # Send Follow Requests
                         #no hay query para ahcer esto pero una ves alla
                         friend = dmodel.get_user_uid_by_mongo()
                         dmodel.sent_friend_request(client,dgraph_user_id,friend)
                         pass
                     elif option == 15 and mongo_user_id:
-                        # Code to handle "Accept/Reject Follow Requests"
+                        # Accept/Reject Follow Requests
                         MongoFuncs.folow_request_acept_or_deny
                         dmodel.accept_friend_request()
                         dmodel.reject_friend_request
                         pass
                     elif option == 16 and mongo_user_id:
-                        # Code to handle "Unfollow"
+                        # Unfollow
                         dmodel.unfollow_friend
                         pass
                     elif option == 17 and mongo_user_id:
-                        # Code to handle "Block"
+                        # Block
                         dmodel.block
                         pass
                     elif option == 18 and mongo_user_id:
-                        # Code to handle "Unblock"
+                        # Unblock
                         #not in dgraph relationship
                         pass
                     elif option == 19 and mongo_user_id:
-                        # Code to handle "Private Messages"
+                        # Private Messages
                         dmodel.createMessage
                         dmodel.get_my_friends
                         pass
                     elif option == 20 and mongo_user_id:
-                        # Code to handle "View Friends"
+                        # View Friends
                         dmodel.get_my_friends
                         pass
                     elif option == 21 and mongo_user_id:
-                        # Code to handle "Discover Potential Friends"
-                        # Missing query
+                        # Discover Potential Friends
+                        # Missing query (cual missing? es el recursivo)
                         pass
                     elif option == 22:
                         # Cancel
@@ -294,26 +295,23 @@ def main():
                     print_third_menu()
                     option = int(input("Enter your choice: "))
                     if option == 1:
-                        # Code to handle "Posts with Most Likes"
-                        # falta get para esto
-                        pass
+                        # Posts with Most Likes
+                        cmodel.get_top_10_liked_posts(session)
                     elif option == 2:
-                        # Code to handle "Posts with Most Comments"
-                        #falta get para esto
-                        pass
+                        # Posts with Most Comments
+                        cmodel.get_top_10_commented_posts(session)
                     elif option == 3:
-                        # Code to handle "Posts with Most Reports"
-                        # no hay tabla o get pata esto tenemos que hacer el get de reports y con esas ids hacer un psot en cassandra
-                        pass
+                        # Posts with Most Reports
+                        print(MongoFuncs.get_reported_posts(db))
                     elif option == 4:
-                        print(cmodel.get_popularTopics(session,10))
-                        # Code to handle "Most Used Topics"
+                        # Most Used Topics
+                        print(cmodel.get_popularTopics(session))
                     elif option == 5:
-                        print(cmodel.get_popularHashtags(session,10))
-                        # Code to handle "Most Used Hashtags"
+                        # Most Used Hashtags
+                        print(cmodel.get_popularHashtags(session))
                     elif option == 6:
+                        # User Growth
                         print(MongoFuncs.get_user_growth(db))
-                        # Code to handle "User Growth"
                         pass
                     elif option == 7:
                         email = input("Enter email> ")
@@ -322,7 +320,7 @@ def main():
                         if(mongo_user_id):
                             #FAlta esto
                             cmodel.get_LoginUser(session,mongo_user_id)
-                        # Code to handle "User Logins"
+                        # User Logins
                         
                         
                         # falta opcion para user logins pero daily
@@ -340,7 +338,6 @@ def main():
                 MongoFuncs.delete_all(db)
                 # Dgraph
                 dmodel.delete_all(client)
-                pass
             elif option == 6:
                 # Cassandra doesnt need to be closed?
                 mongodb_client.close() # Close Mongo

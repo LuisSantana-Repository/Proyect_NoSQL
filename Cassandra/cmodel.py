@@ -71,6 +71,21 @@ CREATE_COMMENTS_COUNT = """
     comments_count COUNTER
     );
 """
+CREATE_POST_LIKES_ORDERED = """
+    CREATE TABLE Post_likes_ordered (
+    likes_count INT,
+    post_id UUID,
+    PRIMARY KEY (likes_count, post_id)
+) WITH CLUSTERING ORDER BY (likes_count DESC);
+"""
+
+CREATE_POST_COMMENTS_ORDERED = """
+CREATE TABLE Post_comments_ordered (
+    comments_count INT,
+    post_id UUID,
+    PRIMARY KEY (comments_count, post_id)
+) WITH CLUSTERING ORDER BY (comments_count DESC);
+"""
 
 CREATE_LOGIN_USER = """
     CREATE TABLE IF NOT EXISTS Login_by_user (
@@ -189,8 +204,24 @@ def insert_logIn(session,user,ip):
 
 
 def add_Like(session, post_id, user_id):
+    # Obtain current count
+    get_count_stmt = session.prepare("SELECT likes_count FROM Post_likes_count WHERE post_id = ?")
+    rows = session.execute(get_count_stmt, (post_id,))
+    current_likes_count = rows[0].likes_count
+
+    # Delete old count from ordered table
+    delete_stmt = session.prepare("DELETE FROM Post_likes_ordered WHERE likes_count = ? AND post_id = ?")
+    session.execute(delete_stmt, (current_likes_count, post_id))
+
+    # Increase counter
     plc_stmt = session.prepare("UPDATE Post_likes_count SET likes_count = likes_count + 1 WHERE post_id = ?")
     session.execute(plc_stmt, (post_id,))
+
+    # Reinsert row
+    insert_stmt = session.prepare("INSERT INTO Post_likes_ordered (likes_count, post_id) VALUES (?, ?)")
+    session.execute(insert_stmt, (current_likes_count+1, post_id))
+
+    # Logs
     Action="Liked a post"
     time = datetime.now()
     data = []
@@ -263,6 +294,20 @@ def get_popularHashtags(session, limit=10):
     rows = session.execute(query, (limit))
     return list(rows)
 
+def get_top_10_liked_posts(session):
+    query = "SELECT post_id, likes_count FROM Post_likes_ordered LIMIT 10"
+    rows = session.execute(query)
+    print("Top 10 Most Liked Posts:")
+    for i, row in enumerate(rows, start=1):
+        print(f"{i}. Post ID: {row.post_id}, Likes: {row.likes_count}")
+
+def get_top_10_commented_posts(session):
+    query = "SELECT post_id, comments_count FROM Post_comments_ordered LIMIT 10"
+    rows = session.execute(query)
+    print("Top 10 Most Commented Posts:")
+    for i, row in enumerate(rows, start=1):
+        print(f"{i}. Post ID: {row.post_id}, Comments: {row.comments_count}")
+
 def create_keyspace(session, keyspace, replication_factor):
     session.execute(CREATE_KEYSPACE.format(keyspace, replication_factor))
 
@@ -272,6 +317,8 @@ def create_schema(session):
     session.execute(CREATE_POST_BY_PARENT)
     session.execute(CREATE_POST_LIKES)
     session.execute(CREATE_COMMENTS_COUNT)
+    session.execute(CREATE_POST_LIKES_ORDERED)
+    session.execute(CREATE_POST_COMMENTS_ORDERED)
     session.execute(CREATE_LOGIN_USER)
     session.execute(CREATE_LOGIN_DATE)
     session.execute(CREATE_ACTIVITY_TABLE)
@@ -289,3 +336,4 @@ def delete_all(session):
             session.execute(f"DROP TABLE {table_name}")    
     except Exception as e:
         return
+
