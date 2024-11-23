@@ -74,7 +74,7 @@ def get_save_post(db, user_id, post_id):
     result = db.users.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"saved_posts": post_id}})
     return result.modified_count
 
-def get_folow_request(db, user_id, requester_id, action):
+def folow_request_acept_or_deny(db, user_id, requester_id, action):
     if action == "accept":
         db.users.update_one({"_id": ObjectId(user_id)}, {"$pull": {"follow_requests": requester_id}})
     elif action == "deny":

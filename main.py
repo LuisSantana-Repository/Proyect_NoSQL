@@ -20,6 +20,39 @@ DB_NAME = os.getenv('MONGODB_DB_NAME', 'socialmedia')
 
 # Dgraph Connection
 DGRAPH_URI = os.getenv('DGRAPH_URI', 'localhost:9080')
+def choose_category():
+    categories = ["Action", "Fantasy", "Theory", "Adventure", "Comedy", "Drama", "Mystery", "Horror"]
+    print("Available categories:")
+    for i, category in enumerate(categories, start=1):
+        print(f"{i}. {category}")
+    while True:
+        choice = int(input("Enter the number corresponding to your choice: "))
+        if 1 <= choice <= len(categories):
+            return categories[choice - 1]
+        else:
+            print(f"Please choose a number between 1 and {len(categories)}.")
+
+def get_hashtags():
+    hashtags_input = input("Enter hashtags separated by commas: ").strip()
+    hashtags = [tag.strip() for tag in hashtags_input.split(",") if tag.strip()]
+    return hashtags
+
+def choose_languages():
+
+    languages = ["English", "Spanish"]
+    
+    print("Available languages:")
+    for i, language in enumerate(languages, start=1):
+        print(f"{i}. {language}")
+
+    print("\nEnter the numbers corresponding to the languages you want, separated by commas:")
+    
+    while True:
+        choices = input("Your selection: ")
+        if 1 <= choices <= len(languages):
+            return languages[choices - 1]
+        else:
+            print(f"Please choose numbers between 1 and {len(languages)}.")
 
 def print_menu():
     options = {
@@ -99,7 +132,7 @@ def main():
     # Initialize Client Stub and Dgraph Client
     client_stub = create_client_stub()
     client = create_client(client_stub)
-
+    
     while True:
         mongo_user_id = None
         dgraph_user_id = None
@@ -145,61 +178,108 @@ def main():
                         cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 3 and mongo_user_id:
                         # Code to handle "Modify Profile Information"
+                        # question new bie
                         
+                        # question new social profiles
+                        
+                        # question new name 
                         pass
                     elif option == 4 and mongo_user_id:
                         # Code to handle "Add/Update Preferences"
+                        preferences = choose_category()
+                        lenguage = choose_languages()
+                        tags = get_hashtags()
+                        # privacity setting
                         pass
                     elif option == 5 and mongo_user_id:
                         # Code to handle "Post"
+                        post = input("Write your post here >")
+                        hashtags = get_hashtags()
+                        categoty = choose_category()
+                        lenguage = choose_languages()
+                        
+                        cmodel.insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,None)
                         pass
                     elif option == 6 and mongo_user_id:
+                        #get posts to choose who to comment
+                        
+                        #do option 5 but change parent to the post 
                         # Code to handle "Comment on Posts"
                         pass
                     elif option == 7 and mongo_user_id:
                         # Code to handle "View Your Feed"
+                            #list post to chose from   
+                            # menu (To decide if like or not like)
                         pass
                     elif option == 8 and mongo_user_id:
                         # Code to handle "Search for Users by Name or Tags"
+                        input("Name or tag>")
+                        #have the serch user by name or tag but missing the privasity notification or the block feature
+                        #MongoFuncs.get_users_by_name
+                        #MongoFuncs.get_users_by_tag
                         pass
                     elif option == 9 and mongo_user_id:
                         # Code to handle "View a User's Posts"
+                        #lists of users or decide myself
+                        
+                        #cmodel.get_post_by_user
                         pass
                     elif option == 10 and mongo_user_id:
                         # Code to handle "Discover Posts"
+                        #do cpsot by each ppreference anf do a join
                         pass
                     elif option == 11 and mongo_user_id: 
                         # Code to handle "Report Posts"
+                        #list post or input post id
+                        reson = input("Reson of report >")
                         pass
                     elif option == 12 and mongo_user_id:
                         # Code to handle "Save Posts"
+                        
+                        #list post or input post id
+                        
+                        #also a way to see my saved post is needed
                         pass
                     elif option == 13 and mongo_user_id:
                         # Code to handle "View Notifications"
+                        print(MongoFuncs.get_noficitation(db,mongo_user_id))
                         pass
                     elif option == 14 and mongo_user_id:
                         # Code to handle "Send Follow Requests"
+                        #no hay query para ahcer esto pero una ves alla
+                        friend = dmodel.get_user_uid_by_mongo()
+                        dmodel.sent_friend_request(client,dgraph_user_id,friend)
                         pass
                     elif option == 15 and mongo_user_id:
                         # Code to handle "Accept/Reject Follow Requests"
+                        MongoFuncs.folow_request_acept_or_deny
+                        dmodel.accept_friend_request()
+                        dmodel.reject_friend_request
                         pass
                     elif option == 16 and mongo_user_id:
                         # Code to handle "Unfollow"
+                        dmodel.unfollow_friend
                         pass
                     elif option == 17 and mongo_user_id:
                         # Code to handle "Block"
+                        dmodel.block
                         pass
                     elif option == 18 and mongo_user_id:
                         # Code to handle "Unblock"
+                        #not in dgraph relationship
                         pass
                     elif option == 19 and mongo_user_id:
                         # Code to handle "Private Messages"
+                        dmodel.createMessage
+                        dmodel.get_my_friends
                         pass
                     elif option == 20 and mongo_user_id:
                         # Code to handle "View Friends"
+                        dmodel.get_my_friends
                         pass
                     elif option == 21 and mongo_user_id:
                         # Code to handle "Discover Potential Friends"
+                        # Missing query
                         pass
                     elif option == 22:
                         # Cancel
@@ -223,7 +303,7 @@ def main():
                         pass
                     elif option == 3:
                         # Code to handle "Posts with Most Reports"
-                        # no hay tabla o get pata esto
+                        # no hay tabla o get pata esto tenemos que hacer el get de reports y con esas ids hacer un psot en cassandra
                         pass
                     elif option == 4:
                         print(cmodel.get_popularTopics(session,10))
@@ -241,8 +321,11 @@ def main():
                         mongo_user_id = MongoFuncs.get_Log_In()
                         if(mongo_user_id):
                             #FAlta esto
-                            print("Aqui va algo que falta")
+                            cmodel.get_LoginUser(session,mongo_user_id)
                         # Code to handle "User Logins"
+                        
+                        
+                        # falta opcion para user logins pero daily
                     elif option == 8:
                         # Cancel
                         pass
