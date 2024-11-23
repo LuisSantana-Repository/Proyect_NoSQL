@@ -20,7 +20,7 @@ def set_add_preferences(db, user_id, languages=None, tags=None):
     if tags:
         update["tag_preferences"] = {"$addToSet": {"$each": tags}}
     
-    result = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update})
+    result = db.users.update_one({"_id": user_id}, {"$set": update})
     return result.modified_count
 
 
@@ -43,11 +43,11 @@ def set_update_profile_information(db, user_id, bio=None, name=None):
     if name:
         update["name"] = name
 
-    result = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update})
+    result = db.users.update_one({"_id": user_id}, {"$set": update})
     return result.modified_count
 
 def Set_privacy(db, user_id, privacy_setting):
-    result = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"privacy_setting": privacy_setting}})
+    result = db.users.update_one({"_id": user_id}, {"$set": {"privacy_setting": privacy_setting}})
     return result.modified_count
 
 def get_common_preferences(db, limit=10):
@@ -99,7 +99,7 @@ def folow_request_acept_or_deny(db, user_id, requester_id, action):
 
 def set_add_social_link(db, user_id, platform, url):
     result = db.users.update_one(
-        {"_id": ObjectId(user_id)},
+        {"_id": user_id},
         {"$addToSet": {"social_links": {"platform": platform, "url": url}}}
     )
     return result.modified_count

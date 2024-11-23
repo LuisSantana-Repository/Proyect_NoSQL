@@ -5,8 +5,8 @@
 3 - Acciones de usuario:
 - Register (mongo) DONE, needs testing for ids
 - Log In (mongo y Cassandra) DONE, requires test
-- Modify Profile information (mongo)
-- Add/Update preferences (mongo) 
+- Modify Profile information (mongo) done, require tests
+- Add/Update preferences (mongo)  la hice en ela nterior checar si lo podemos dejar asi mejor.
 - Postear (Cassandra) DONE, requires test
 - Comentar post (Cassandra) DONE, requires test
 - Like post (cassandra) Done, requires test
@@ -35,5 +35,5 @@
 - User growth (mongo) Done, requires test
 - Logins de usuarios (Cassandra)
 
-5 - Delete
+5 - Delete DONE
 6 - Exit

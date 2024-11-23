@@ -47,10 +47,10 @@ def choose_languages():
     for i, language in enumerate(languages, start=1):
         print(f"{i}. {language}")
 
-    print("\nEnter the numbers corresponding to the languages you want, separated by commas:")
+    print("\nEnter the number of lengualle:")
     
     while True:
-        choices = input("Your selection: ")
+        choices = int(input("Your selection: "))
         if 1 <= choices <= len(languages):
             return languages[choices - 1]
         else:
@@ -107,6 +107,21 @@ def print_third_menu():
         6: "User Growth",
         7: "User Logins",
         8: "Cancel"
+    }
+    for key, value in options.items():
+        print(f"{key} -- {value}")
+
+
+
+def print_Profile_Opctions():
+    options = {
+        1: "Change bio",
+        2: "Change name",
+        3: "Privacity settings",
+        4: "add lenguaje preferences",
+        5: "add Tag preferences",
+        6: "add social Links",
+        7: "Cancel"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -180,11 +195,41 @@ def main():
                         cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 3 and mongo_user_id:
                         # Modify Profile Information
-                        # question new bio
-                        
-                        # question new social profiles
-                        
-                        # question new name 
+                        print_Profile_Opctions()
+                        inputs = int(input("select an option> "))
+                        if(inputs == 1):
+                            #bio Change
+                            bio = input("New bio data > ")
+                            MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
+                            pass
+                        elif(inputs == 2):
+                            #name change
+                            name = input("chose new name > ")
+                            MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
+                            pass
+                        elif(inputs == 3):
+                            #private or public
+                            privacity = input("private or public >")
+                            if(privacity == "private"):
+                                MongoFuncs.Set_privacy(db,mongo_user_id,"private")
+                            if(privacity == "public"):
+                                MongoFuncs.Set_privacy(db,mongo_user_id,"public")
+                            pass
+                        elif(inputs == 4):
+                            #lengualle
+                            lenguaje = choose_languages()
+                            MongoFuncs.set_add_preferences(db,mongo_user_id,lenguaje)
+                            pass
+                        elif(inputs == 5):
+                            tags = get_hashtags()
+                            MongoFuncs.set_add_preferences(db,mongo_user_id,None,tags)
+                            pass
+                        elif(inputs == 6):
+                            #social links
+                            plataform = input("Plataform Name >").strip()
+                            Url = input("Url>").strip()
+                            MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
+                            pass
                         pass
                     elif option == 4 and mongo_user_id:
                         # Add/Update Preferences
