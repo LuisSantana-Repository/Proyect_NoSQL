@@ -212,12 +212,17 @@ def main():
                             #list post to chose from   
                             # menu (To decide if like or not like) // No, solo muestra los posts de la gente que sigue
                         pass
-                    elif option == 8 and mongo_user_id:
+                    elif option == 8:
                         # Search for Users by Name or Tags
-                        input("Name or tag>")
+                        search_type = input("Name or tag>")
+                        if(search_type == "Name"):
+                            Name = input("Tell Me its Name >")
+                            result = MongoFuncs.get_users_by_name(db,Name)
+                            print(result)
+                        elif(search_type == "Tag"):
+                            Tag = input("Write a prefered Tag >")
+                            MongoFuncs.get_users_by_tag(db,Tag)
                         #have the serch user by name or tag but missing the privasity notification or the block feature
-                        #MongoFuncs.get_users_by_name
-                        #MongoFuncs.get_users_by_tag
                         pass
                     elif option == 9 and mongo_user_id:
                         # View a User's Posts
