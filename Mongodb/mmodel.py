@@ -14,7 +14,7 @@ class User(BaseModel):
     name: Optional[str] = Field(None)
     privacy_setting: str = Field(default="public")  # 'public' or 'private'
     language_preferences: List[str] = Field(default=[])
-    topic_preferences: List[str] = Field(default=[])
+    tag_preferences: List[str] = Field(default=[])
     social_links: List[dict] = Field(default_factory=list)  # [{"platform": "Twitter", "url": "https://..."}]
     saved_posts: List[str] = Field(default=[])
     registration_timestamp: datetime = Field(default_factory=datetime.now)
@@ -32,7 +32,7 @@ class User(BaseModel):
                 "name": "John Doe",
                 "privacy_setting": "private",
                 "language_preferences": ["en", "es"],
-                "topic_preferences": ["technology", "science"],
+                "tag_preferences": ["technology", "science"],
                 "social_links": [
                     {"platform": "Twitter", "url": "https://twitter.com/john_doe"},
                     {"platform": "GitHub", "url": "https://github.com/johndoe"}

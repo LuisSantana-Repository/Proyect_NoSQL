@@ -18,7 +18,7 @@ def set_add_preferences(db, user_id, languages=None, tags=None):
     if languages:
         update["language_preferences"] = {"$addToSet": {"$each": languages}}
     if tags:
-        update["topic_preferences"] = {"$addToSet": {"$each": tags}}
+        update["tag_preferences"] = {"$addToSet": {"$each": tags}}
     
     result = db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update})
     return result.modified_count
@@ -29,7 +29,7 @@ def set_remove_Preferences(db, user_id, languages=None, tags=None):
     if languages:
         update["language_preferences"] = {"$pull": {"$in": languages}}
     if tags:
-        update["topic_preferences"] = {"$pull": {"$in": tags}}
+        update["tag_preferences"] = {"$pull": {"$in": tags}}
     
     result = db.users.update_one({"_id": ObjectId(user_id)}, update)
     return result.modified_count
@@ -52,10 +52,10 @@ def Set_privacy(db, user_id, privacy_setting):
 
 def get_common_preferences(db, limit=10):
     pipeline = [
-        {"$unwind": "$topic_preferences"},
+        {"$unwind": "$tag_preferences"},
         {
             "$group": {
-                "_id": "$topic_preferences",
+                "_id": "$tag_preferences",
                 "count": {"$sum": 1}
             }
         },
@@ -65,10 +65,25 @@ def get_common_preferences(db, limit=10):
     return list(db.users.aggregate(pipeline))
 
 def get_users_by_name(db, name):
-    return list(db.users.find({"username": {"$regex": name, "$options": "i"}}, {"username": 1, "bio": 1}))
+    users = db.users.find(
+        {"username": {"$regex": name, "$options": "i"}},
+        {"username": 1, "bio": 1, "social_links": 1, "privacy_setting": 1}
+    )
+    result = []
+    for user in users:
+        if user.get("privacy_setting") == "private":
+            result.append({"username": user["username"]})  # Only include username for private users
+        else:
+            result.append({
+                "username": user["username"],
+                "bio": user.get("bio"),
+                "social_links": user.get("social_links")
+            })
+    
+    return result
 
 def get_users_by_tag(db, tag):
-    return list(db.users.find({"topic_preferences": tag, "privacy_setting": "public"}, {"username": 1, "bio": 1, "topic_preferences": 1}))
+    return list(db.users.find({"tag_preferences": tag, "privacy_setting": "public"}, {"username": 1, "bio": 1, "social_links": 1,"tag_preferences": 1}))
 
 def get_save_post(db, user_id, post_id):
     result = db.users.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"saved_posts": post_id}})
@@ -104,7 +119,7 @@ def get_user_growth(db):
 def set_user_add_interest(db, user_id, interests):
     result = db.users.update_one(
         {"_id": ObjectId(user_id)},
-        {"$addToSet": {"topic_preferences": {"$each": interests}}}
+        {"$addToSet": {"tag_preferences": {"$each": interests}}}
     )
     return result.modified_count
 
