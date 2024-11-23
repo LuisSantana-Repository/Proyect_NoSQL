@@ -75,23 +75,24 @@ def print_second_menu():
         3: "Modify Profile Information",
         4: "Add/Update Preferences",
         5: "Post",
-        6: "Comment on Posts",
-        7: "View Your Feed",
-        8: "Search for Users by Name or Tags",
-        9: "View a User's Posts",
-        10: "Discover Posts",
-        11: "Report Posts",
-        12: "Save Posts",
-        13: "View Notifications",
-        14: "Send Follow Requests",
-        15: "Accept/Reject Follow Requests",
-        16: "Unfollow",
-        17: "Block",
-        18: "Unblock",
-        19: "Private Messages",
-        20: "View Friends",
-        21: "Discover Potential Friends",
-        22: "Cancel"
+        6: "Like Post",
+        7: "Comment on Post",
+        8: "View Your Feed",
+        9: "Search for Users by Name or Tags",
+        10:"View a User's Posts",
+        11: "Discover Posts",
+        12: "Report Posts",
+        13: "Save Posts",
+        14: "View Notifications",
+        15: "Send Follow Requests",
+        16: "Accept/Reject Follow Requests",
+        17: "Unfollow",
+        18: "Block",
+        19: "Unblock",
+        20: "Private Messages",
+        21: "View Friends",
+        22: "Discover Potential Friends",
+        23: "Cancel"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -135,9 +136,9 @@ def main():
     client_stub = create_client_stub()
     client = create_client(client_stub)
     
+    mongo_user_id = None
+    dgraph_user_id = None
     while True:
-        mongo_user_id = None
-        dgraph_user_id = None
         print_menu()
         option = int(input("Enter your choice: "))
         try:
@@ -198,91 +199,95 @@ def main():
                         hashtags = get_hashtags()
                         categoty = choose_category()
                         lenguage = choose_languages()
-                        
                         cmodel.insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,None)
                         pass
                     elif option == 6 and mongo_user_id:
-                        # Comment Post
-                        #get posts to choose who to comment // No, solo envia el commentario a un post id, supones que ya sabe el post id al que quiere comentar
-                        
-                        #do option 5 but change parent to the post 
-                        pass
+                        # Like Post
+                        post = input("Post to like >")
+                        cmodel.add_Like(session, post, mongo_user_id)
                     elif option == 7 and mongo_user_id:
-                        # View Your Feed
-                            #list post to chose from   
-                            # menu (To decide if like or not like) // No, solo muestra los posts de la gente que sigue
+                        # Comment Post
+                        parent = input("Post to comment >")
+                        post = input("Write your post here >")
+                        hashtags = get_hashtags()
+                        categoty = choose_category()
+                        lenguage = choose_languages()
+                        cmodel.comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
                         pass
                     elif option == 8 and mongo_user_id:
+                        # View Your Feed 
+                        pass
+                    elif option == 9 and mongo_user_id:
                         # Search for Users by Name or Tags
                         input("Name or tag>")
                         #have the serch user by name or tag but missing the privasity notification or the block feature
                         #MongoFuncs.get_users_by_name
                         #MongoFuncs.get_users_by_tag
                         pass
-                    elif option == 9 and mongo_user_id:
+                    elif option == 10 and mongo_user_id:
                         # View a User's Posts
                         #lists of users or decide myself // No, solo inserta el user id y muestra sus posts
                         
                         #cmodel.get_post_by_user
                         pass
-                    elif option == 10 and mongo_user_id:
+                    elif option == 11 and mongo_user_id:
                         # Discover Posts
                         #do cpsot by each ppreference anf do a join
                         pass
-                    elif option == 11 and mongo_user_id: 
+                    elif option == 12 and mongo_user_id: 
                         # Report Posts
                         #list post or input post id
                         reson = input("Reson of report >")
                         pass
-                    elif option == 12 and mongo_user_id:
+                    elif option == 13 and mongo_user_id:
                         # Save Posts
                         
                         # input post id
                         
                         #also a way to see my saved post is needed
                         pass
-                    elif option == 13 and mongo_user_id:
+                    elif option == 14 and mongo_user_id:
                         # View Notifications
                         print(MongoFuncs.get_noficitation(db,mongo_user_id))
                         pass
-                    elif option == 14 and mongo_user_id:
+                    elif option == 15 and mongo_user_id:
                         # Send Follow Requests
                         #no hay query para ahcer esto pero una ves alla
                         friend = dmodel.get_user_uid_by_mongo()
                         dmodel.sent_friend_request(client,dgraph_user_id,friend)
                         pass
-                    elif option == 15 and mongo_user_id:
+                    elif option == 16 and mongo_user_id:
                         # Accept/Reject Follow Requests
                         MongoFuncs.folow_request_acept_or_deny
                         dmodel.accept_friend_request()
                         dmodel.reject_friend_request
                         pass
-                    elif option == 16 and mongo_user_id:
+                    elif option == 17 and mongo_user_id:
                         # Unfollow
                         dmodel.unfollow_friend
                         pass
-                    elif option == 17 and mongo_user_id:
+                    elif option == 18 and mongo_user_id:
                         # Block
                         dmodel.block
                         pass
-                    elif option == 18 and mongo_user_id:
+                    elif option == 19 and mongo_user_id:
                         # Unblock
                         #not in dgraph relationship
                         pass
-                    elif option == 19 and mongo_user_id:
+                    elif option == 20 and mongo_user_id:
                         # Private Messages
                         dmodel.createMessage
                         dmodel.get_my_friends
                         pass
-                    elif option == 20 and mongo_user_id:
+                    elif option == 21 and mongo_user_id:
                         # View Friends
                         dmodel.get_my_friends
                         pass
-                    elif option == 21 and mongo_user_id:
+                    elif option == 22 and mongo_user_id:
                         # Discover Potential Friends
                         # Missing query (cual missing? es el recursivo)
                         pass
-                    elif option == 22:
+                    elif option == 23:
                         # Cancel
                         pass
                     else:

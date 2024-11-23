@@ -76,7 +76,7 @@ CREATE_POST_LIKES_ORDERED = """
     likes_count INT,
     post_id UUID,
     PRIMARY KEY (likes_count, post_id)
-) WITH CLUSTERING ORDER BY (likes_count DESC);
+);
 """
 
 CREATE_POST_COMMENTS_ORDERED = """
@@ -84,7 +84,7 @@ CREATE TABLE Post_comments_ordered (
     comments_count INT,
     post_id UUID,
     PRIMARY KEY (comments_count, post_id)
-) WITH CLUSTERING ORDER BY (comments_count DESC);
+);
 """
 
 CREATE_LOGIN_USER = """
@@ -188,9 +188,35 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     else:
         session.execute(topic_update_stmt, (categoty))
 
+def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
+    # Insert new post
+    insert_Post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent)
+    
+    # Obtain current count
+    get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
+    rows = session.execute(get_count_stmt, (post_id,))
+    current_comments_count = rows[0].comments_count
+
+    # Delete old count from ordered table
+    delete_stmt = session.prepare("DELETE FROM Post_comments_ordered WHERE comments_count = ? AND post_id = ?")
+    session.execute(delete_stmt, (current_comments_count, post_id))
+
+    # Increase counter
+    pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + 1 WHERE post_id = ?")
+    session.execute(pcc_stmt, (post_id,))
+
+    # Reinsert row
+    insert_stmt = session.prepare("INSERT INTO Post_comments_ordered (comments_count, post_id) VALUES (?, ?)")
+    session.execute(insert_stmt, (current_comments_count+1, post_id))
+
+    # Logs
+    Action = "Commented on a post"
+    time = datetime.now()
+    data = []
+    data.append((mongo_user_id, time, Action, post_id))
 
 def insert_logIn(session,user,ip):
-    timestamp = datetime.now()
+    timestamp = datetime.datetime.now()
     lbu_stmt = session.prepare("""
         INSERT INTO Login_by_user (user_id, login_timestamp, ip_address)
         VALUES (?, ?, ?)
@@ -199,6 +225,9 @@ def insert_logIn(session,user,ip):
         INSERT INTO Login_by_date (login_timestamp, user_id, ip_address)
         VALUES (?, ?, ?)
     """)
+    # print(user)
+    user = uuid.UUID(user)
+    # print(user)
     session.execute(lbd_stmt, (timestamp, user, ip))
     session.execute(lbu_stmt, (user, timestamp, ip))
 
@@ -295,14 +324,14 @@ def get_popularHashtags(session, limit=10):
     return list(rows)
 
 def get_top_10_liked_posts(session):
-    query = "SELECT post_id, likes_count FROM Post_likes_ordered LIMIT 10"
+    query = "SELECT post_id, likes_count FROM Post_likes_ordered ORDER BY likes_count DESC LIMIT 10"
     rows = session.execute(query)
     print("Top 10 Most Liked Posts:")
     for i, row in enumerate(rows, start=1):
         print(f"{i}. Post ID: {row.post_id}, Likes: {row.likes_count}")
 
 def get_top_10_commented_posts(session):
-    query = "SELECT post_id, comments_count FROM Post_comments_ordered LIMIT 10"
+    query = "SELECT post_id, comments_count FROM Post_comments_ordered ORDER BY comments_count DESC LIMIT 10"
     rows = session.execute(query)
     print("Top 10 Most Commented Posts:")
     for i, row in enumerate(rows, start=1):
