@@ -16,20 +16,19 @@ def set_schema(client):
         follow_request
     }
     type Message {
-    content: string
-    timestamp: datetime
-    receiver: uid
+    content
+    timestamp
+    receiver
     }
-    receiver: uid @reversed
+    receiver: uid @count @reverse .
     content: string .
     timestamp: datetime .
-    receiver: uid .
     username: string @index(fulltext) .
-    follows: [uid] .
+    follows: [uid] @reverse .
     blocked: [uid] @reverse .
     sent_message: [uid] @reverse .
     follow_request: [uid] @reverse .
-    mongo: string @index(hex) .
+    mongo: string @index(hash) .
     """
     return client.alter(pydgraph.Operation(schema=schema))
 
@@ -50,8 +49,10 @@ def createUser(client,username, mongo):
         }
         response = txn.mutate(set_obj=p)
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
-        print(f"UIDs: {response.uids}")
+        #print(f"Commit Response: {response}")
+        assigned_uid = response.uids.get("user1")
+        #print(f"UIDs: {response.uids}")
+        return assigned_uid
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.

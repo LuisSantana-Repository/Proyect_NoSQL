@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from mmodel import User, Report, Notification
+from Mongodb.mmodel import User, Report, Notification
 from bson import ObjectId
 
 def add_user_registtration(db, username, email, password, bio=None, name=None):
@@ -155,3 +155,10 @@ def delete_all(db):
             db[collection_name].drop()
     except Exception as e:
         return
+
+
+def get_Log_In(db, email, password):
+    user = db.users.find_one({"email": email, "password": password}, {"_id": 1})
+    if user:
+        return str(user["_id"])
+    return None

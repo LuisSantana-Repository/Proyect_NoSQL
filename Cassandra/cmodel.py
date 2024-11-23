@@ -41,7 +41,7 @@ CREATE_POST_BY_TOPIC = """
     category TEXT,
     language TEXT,
     PRIMARY KEY (category, language, timestamp)
-    ) WITH CLUSTERING ORDER BY (timestamp DESC);
+    ) WITH CLUSTERING ORDER BY (language ASC, timestamp DESC);
 """
 
 CREATE_POST_BY_PARENT = """

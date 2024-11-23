@@ -3,6 +3,7 @@ import os
 import pydgraph
 from cassandra.cluster import Cluster
 from pymongo import MongoClient
+import random
 
 from Cassandra import cmodel
 from DGraph import dmodel
@@ -100,6 +101,8 @@ def main():
     client = create_client(client_stub)
 
     while True:
+        mongo_user_id = None
+        dgraph_user_id = None
         print_menu()
         option = int(input("Enter your choice: "))
         try:
@@ -119,65 +122,83 @@ def main():
                 try:
                     if option == 1:
                         # Code to handle "Register"
-                        pass
+                        username = input("Enter Username> ")
+                        email = input("Enter email> ")
+                        password = input("Enter password> ")
+                        name = input("Enter Oficial Name> ")
+                        bio = input("Enter Bio (opctional)> ")
+                        mongo_user_id = MongoFuncs.add_user_registtration(db,username,email,password,bio,name)
+                        dgraph_user_id = dmodel.createUser(client,username,mongo_user_id)
+                        print(dgraph_user_id)
+                        ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
+                        cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 2:
                         # Code to handle "Log In"
-                        pass
-                    elif option == 3:
+                        email = input("Enter email> ")
+                        password = input("Enter password> ")
+                        mongo_user_id = MongoFuncs.get_Log_In(db,email,password)
+                        print(mongo_user_id)
+                        if(mongo_user_id):
+                            dgraph_user_id = dmodel.get_user_uid_by_mongo(client,mongo_user_id)
+                            print(dgraph_user_id)
+                        ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
+                        cmodel.insert_logIn(session,mongo_user_id,ip)
+                    elif option == 3 and mongo_user_id:
                         # Code to handle "Modify Profile Information"
+                        
                         pass
-                    elif option == 4:
+                    elif option == 4 and mongo_user_id:
                         # Code to handle "Add/Update Preferences"
                         pass
-                    elif option == 5:
+                    elif option == 5 and mongo_user_id:
                         # Code to handle "Post"
                         pass
-                    elif option == 6:
+                    elif option == 6 and mongo_user_id:
                         # Code to handle "Comment on Posts"
                         pass
-                    elif option == 7:
+                    elif option == 7 and mongo_user_id:
                         # Code to handle "View Your Feed"
                         pass
-                    elif option == 8:
+                    elif option == 8 and mongo_user_id:
                         # Code to handle "Search for Users by Name or Tags"
                         pass
-                    elif option == 9:
+                    elif option == 9 and mongo_user_id:
                         # Code to handle "View a User's Posts"
                         pass
-                    elif option == 10:
+                    elif option == 10 and mongo_user_id:
                         # Code to handle "Discover Posts"
                         pass
-                    elif option == 11:
+                    elif option == 11 and mongo_user_id: 
                         # Code to handle "Report Posts"
                         pass
-                    elif option == 12:
+                    elif option == 12 and mongo_user_id:
                         # Code to handle "Save Posts"
                         pass
-                    elif option == 13:
+                    elif option == 13 and mongo_user_id:
                         # Code to handle "View Notifications"
                         pass
-                    elif option == 14:
+                    elif option == 14 and mongo_user_id:
                         # Code to handle "Send Follow Requests"
                         pass
-                    elif option == 15:
+                    elif option == 15 and mongo_user_id:
                         # Code to handle "Accept/Reject Follow Requests"
                         pass
-                    elif option == 16:
+                    elif option == 16 and mongo_user_id:
                         # Code to handle "Unfollow"
                         pass
-                    elif option == 17:
+                    elif option == 17 and mongo_user_id:
                         # Code to handle "Block"
                         pass
-                    elif option == 18:
+                    elif option == 18 and mongo_user_id:
                         # Code to handle "Unblock"
                         pass
-                    elif option == 19:
+                    elif option == 19 and mongo_user_id:
                         # Code to handle "Private Messages"
                         pass
-                    elif option == 20:
+                    elif option == 20 and mongo_user_id:
                         # Code to handle "View Friends"
                         pass
-                    elif option == 21:
+                    elif option == 21 and mongo_user_id:
                         # Code to handle "Discover Potential Friends"
                         pass
                     elif option == 22:
@@ -194,25 +215,34 @@ def main():
                     option = int(input("Enter your choice: "))
                     if option == 1:
                         # Code to handle "Posts with Most Likes"
+                        # falta get para esto
                         pass
                     elif option == 2:
                         # Code to handle "Posts with Most Comments"
+                        #falta get para esto
                         pass
                     elif option == 3:
                         # Code to handle "Posts with Most Reports"
+                        # no hay tabla o get pata esto
                         pass
                     elif option == 4:
+                        print(cmodel.get_popularTopics(session,10))
                         # Code to handle "Most Used Topics"
-                        pass
                     elif option == 5:
+                        print(cmodel.get_popularHashtags(session,10))
                         # Code to handle "Most Used Hashtags"
-                        pass
                     elif option == 6:
+                        print(MongoFuncs.get_user_growth(db))
                         # Code to handle "User Growth"
                         pass
                     elif option == 7:
+                        email = input("Enter email> ")
+                        password = input("Enter password> ")
+                        mongo_user_id = MongoFuncs.get_Log_In()
+                        if(mongo_user_id):
+                            #FAlta esto
+                            print("Aqui va algo que falta")
                         # Code to handle "User Logins"
-                        pass
                     elif option == 8:
                         # Cancel
                         pass

@@ -17,12 +17,12 @@ class User(BaseModel):
     topic_preferences: List[str] = Field(default=[])
     social_links: List[dict] = Field(default_factory=list)  # [{"platform": "Twitter", "url": "https://..."}]
     saved_posts: List[str] = Field(default=[])
-    registration_timestamp: datetime = Field(default_factory=datetime.now())
+    registration_timestamp: datetime = Field(default_factory=datetime.now)
     follow_requests: List[str] = Field(default=[])
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name = True
+        json_schema_extra  = {
             "example": {
                 "_id": "abc123",
                 "username": "john_doe",
@@ -49,11 +49,11 @@ class Report(BaseModel):
     reporting_user_id: str = Field(...)
     reported_content_id: str = Field(...)
     report_reason: str = Field(...)
-    registration_timestamp: datetime = Field(default_factory=datetime.now()) #default factory is able to make dafults but with variable data
+    registration_timestamp: datetime = Field(default_factory=datetime.now) #default factory is able to make dafults but with variable data
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name  = True
+        json_schema_extra  = {
             "example": {
                 "_id": "report123",
                 "reporting_user_id": "user456",
@@ -69,11 +69,11 @@ class Notification(BaseModel):
     user_id: str = Field(...)
     type: str = Field(...) 
     content: str = Field(...)
-    timestamp: datetime = Field(default_factory=datetime.now()) #default factory is able to make dafults but with variable data
+    timestamp: datetime = Field(default_factory=datetime.now) #default factory is able to make dafults but with variable data
 
     class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+        populate_by_name  = True
+        json_schema_extra  = {
             "example": {
                 "_id": "notif123",
                 "user_id": "user789",
