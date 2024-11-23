@@ -6,16 +6,16 @@
 - Register (mongo) DONE, needs testing for ids
 - Log In (mongo y Cassandra) DONE, requires test
 - Modify Profile information (mongo) done, require tests
-- Add/Update preferences (mongo)  la hice en ela nterior checar si lo podemos dejar asi mejor.
+- Add/Update preferences (mongo)  la hice en ela anterior checar si lo podemos dejar asi mejor.
 - Postear (Cassandra) DONE, requires test
 - Comentar post (Cassandra) DONE, requires test
 - Like post (cassandra) Done, requires test
-- Ver tu feed (Cassandra y dgraph)
+- Ver tu feed (Cassandra y dgraph) NO ES POSIBLE POR CONFIGURACION TENEMOS QUE CAMBIAR EL TAG_PREFERENCES A TOPIC PREFERENCES PROQUE NO TENEMOS UNA TABLA PARA TAG SOLO POR TOPICS
 - Buscar usuarios por nombre o tags (mongo) Done, requires test
 - Ver los posts de un usuario (mongo y Cassandra)
-- Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra)
-- Reportar posts (mongo)
-- Guardar posts (mongo)
+- Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
+- Reportar posts (mongo) done, no corrido o testeado
+- Guardar posts (mongo) done, no corrido o testeado
 - Ver notificaciones (mongo) Done, requires test
 - Enviar follow requests (dgraph y mongo) Done, requires test
 - Aceptar/rechazar follow requests (dgraph y mongo) Done, requires test

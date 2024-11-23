@@ -259,8 +259,13 @@ def main():
                         lenguage = choose_languages()
                         cmodel.comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
                         pass
-                    elif option == 8:
+                    elif option == 8 and mongo_user_id:
                         # View Your Feed 
+                        lenguage = MongoFuncs.get_language_preferences(db,mongo_user_id)
+                        tags = MongoFuncs.get_tag_preferences(db,mongo_user_id)
+                        for tag in tags:
+                            #print(cmodel.)
+                            pass
                         pass
                     elif option == 9 and mongo_user_id:
                         # Search for Users by Name or Tags
@@ -277,7 +282,8 @@ def main():
                     elif option == 10 and mongo_user_id:
                         # View a User's Posts
                         #lists of users or decide myself // No, solo inserta el user id y muestra sus posts
-                        
+                        user = input("Give me the user_id>")
+                        cmodel.get_post_by_user(session,user)
                         #cmodel.get_post_by_user
                         pass
                     elif option == 11 and mongo_user_id:
@@ -287,14 +293,19 @@ def main():
                     elif option == 12 and mongo_user_id: 
                         # Report Posts
                         #list post or input post id
-                        reson = input("Reson of report >")
+                        Post_id = input("Post id>")
+                        reason = input("Reason of report >")
+                        MongoFuncs.add_report_post(db,mongo_user_id,Post_id,reason)
                         pass
                     elif option == 13 and mongo_user_id:
                         # Save Posts
+                        Post_id = input("Post ID>")
                         
                         # input post id
-                        
+                        MongoFuncs.add_saved_post(db,mongo_user_id,Post_id)
                         #also a way to see my saved post is needed
+                        
+                        print(MongoFuncs.get_saved_posts(db,mongo_user_id))
                         pass
                     elif option == 14 and mongo_user_id:
                         # View Notifications
@@ -404,6 +415,7 @@ def main():
             print(f"An error occurred: {e}")
 
 if __name__ == '__main__':
+    
     try:
         main()
     except Exception as e:

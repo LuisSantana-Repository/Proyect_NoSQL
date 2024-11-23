@@ -85,9 +85,14 @@ def get_users_by_name(db, name):
 def get_users_by_tag(db, tag):
     return list(db.users.find({"tag_preferences": tag, "privacy_setting": "public"}, {"username": 1, "bio": 1, "social_links": 1,"tag_preferences": 1}))
 
-def get_save_post(db, user_id, post_id):
-    result = db.users.update_one({"_id": ObjectId(user_id)}, {"$addToSet": {"saved_posts": post_id}})
-    return result.modified_count
+def get_saved_posts(db, user_id):
+    user = db.users.find_one(
+        {"_id": ObjectId(user_id)},  # Match the user by their ObjectId
+        {"_id": 0, "saved_posts": 1}  # Only retrieve the saved_posts field
+    )
+    if user:
+        return user.get("saved_posts", [])  # Return the saved_posts list or an empty list if not found
+    return None
 
 def folow_request_acept_or_deny(db, user_id, requester_id, action):
     if action == "accept":
@@ -177,3 +182,24 @@ def get_Log_In(db, email, password):
     if user:
         return str(user["_id"])
     return None
+
+
+def get_tag_preferences(db, user_id):
+    user = db.users.find_one({"_id": user_id}, {"tag_preferences": 1})
+    if user:
+        return user.get("tag_preferences", [])
+    return None
+
+
+def get_language_preferences(db, user_id):
+    user = db.users.find_one({"_id": user_id}, {"language_preferences": 1})
+    if user:
+        return user.get("language_preferences", [])
+    return None
+
+def add_saved_post(db, user_id, post_id):
+    result = db.users.update_one(
+        {"_id": user_id},  # Match the user by their ObjectId
+        {"$addToSet": {"saved_posts": post_id}}  # Add post_id to the saved_posts array if not already present
+    )
+    return result.modified_count
