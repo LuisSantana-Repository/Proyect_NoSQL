@@ -1,23 +1,25 @@
-1 - Create schema
+1 - Create schema DONE (probably needs update for cassandra to use str instrad of UUID)
+
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Register (mongo)
-- Log In (mongo y Cassandra)
+- Register (mongo) DONE, needs testing for ids
+- Log In (mongo y Cassandra) DONE, requires test
 - Modify Profile information (mongo)
-- Add/Update preferences (mongo)
-- Postear (Cassandra)
-- Comentar post (Cassandra)
+- Add/Update preferences (mongo) 
+- Postear (Cassandra) DONE, requires test
+- Comentar post (Cassandra) DONE, requires test
+- Like post (cassandra) Done, requires test
 - Ver tu feed (Cassandra y dgraph)
-- Buscar usuarios por nombre o tags (mongo)
+- Buscar usuarios por nombre o tags (mongo) Done, requires test
 - Ver los posts de un usuario (mongo y Cassandra)
 - Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra)
 - Reportar posts (mongo)
 - Guardar posts (mongo)
-- Ver notificaciones (mongo)
-- Enviar follow requests (dgraph y mongo)
-- Aceptar/rechazar follow requests (dgraph y mongo)
-- Unfollow (dgraph)
+- Ver notificaciones (mongo) Done, requires test
+- Enviar follow requests (dgraph y mongo) Done, requires test
+- Aceptar/rechazar follow requests (dgraph y mongo) Done, requires test
+- Unfollow (dgraph) 
 - Bloquear (dgraph)
 - Desbloquear (dgraph)
 - Mensajes "privados" (dgraph)
@@ -25,12 +27,12 @@
 - Descubrir posibles amigos (dgraph)
 
 4 - Acciones de analisis:
-- Posts con mas likes (Cassandra)
-- Posts con mas comentarios (Cassandra)
-- Posts con mas reportes (Cassandra y mongo)
-- Topics mas usados (Cassandra)
-- Hashtags mas usados (Cassandra)
-- User growth (mongo)
+- Posts con mas likes (Cassandra) Done, requires test
+- Posts con mas comentarios (Cassandra) Done, requires test
+- Posts con mas reportes (Cassandra y mongo) Done, requires test
+- Topics mas usados (Cassandra) Done, requires test
+- Hashtags mas usados (Cassandra) Done, requires test
+- User growth (mongo) Done, requires test
 - Logins de usuarios (Cassandra)
 
 5 - Delete
