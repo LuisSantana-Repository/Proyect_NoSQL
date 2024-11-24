@@ -54,7 +54,7 @@ CREATE_POST_BY_PARENT = """
     tags SET<TEXT>,
     category TEXT,
     language TEXT,
-    PRIMARY KEY (parent_id)
+    PRIMARY KEY (parent_id, post_id)
     );
 """
 
@@ -140,16 +140,20 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     Topics_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + ? WHERE topic = ?")
     Hastags_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + ? WHERE hashtag = ?")
     
+    time = datetime.now()
     post_uid = str(uuid.uuid4())
+    
     if(parrent is None):
         parrent = post_uid
+        # Insert Action
+        Action="Created a Post"
+        data = []
+        data.append((userUUID,time,Action,post_uid))
+        session.execute(Activity_stmt, data[0])
+
     print(f"Parent: {parrent}\nPost: {post_uid}")
-    if parrent != post_uid:  # This is a comment
-        pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + 1 WHERE post_id = ?")
-        session.execute(pcc_stmt, (parrent))
 
     # Post inserts
-    time = datetime.now()
     data = []
     data.append((userUUID,post_uid,post,time,set(hashtags),categoty,lenguage,parrent))
     session.execute(pbu_stmt, data[0])
@@ -183,11 +187,7 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     session.execute(Topics_stmt, (1, categoty))
     print("Post succesfully created")
     
-    # Insert Action
-    Action="Created a Post"
-    data = []
-    data.append((userUUID,time,Action,post_uid))
-    session.execute(Activity_stmt, data[0])
+
  
 def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
     # Insert new post
@@ -195,20 +195,20 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
     
     # Obtain current count
     get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
-    rows = session.execute(get_count_stmt, (post_id,))
+    rows = session.execute(get_count_stmt, (parent,))
     current_comments_count = rows[0].comments_count
 
     # Delete old count from ordered table
     delete_stmt = session.prepare("DELETE FROM Post_comments_ordered WHERE comments_count = ? AND post_id = ?")
-    session.execute(delete_stmt, (current_comments_count, post_id))
+    session.execute(delete_stmt, (current_comments_count, parent))
 
     # Increase counter
     pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + 1 WHERE post_id = ?")
-    session.execute(pcc_stmt, (post_id,))
+    session.execute(pcc_stmt, (parent,))
 
     # Reinsert row
     insert_stmt = session.prepare("INSERT INTO Post_comments_ordered (comments_count, post_id) VALUES (?, ?)")
-    session.execute(insert_stmt, (current_comments_count+1, post_id))
+    session.execute(insert_stmt, (current_comments_count+1, parent))
 
     # Logs
     Action = "Commented on a post"
