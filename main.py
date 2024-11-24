@@ -286,7 +286,7 @@ def main():
                                     cmodel.print_post(session, post, friend['username'])
                                     cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                                 print("-" * 40)
-                        elif option == 8:   #Imprime pero me gustaria cambair el formato
+                        elif option == 8:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -294,15 +294,19 @@ def main():
                             search_type = input("Name or Topic>")
                             if(search_type == "Name"):
                                 Name = input("Tell Me its Name >").strip()
-                                print(Name)
-                                result = MongoFuncs.get_users_by_name(db,Name)
-                                print(result)
+                                # print(Name)
+                                results = MongoFuncs.get_users_by_name(db,Name)
+                                for result in results:
+                                    print("-" * 40)
+                                    MongoFuncs.print_user(result)
+                                print("-" * 40)
                             elif(search_type == "Topic"):
                                 topic = choose_category()
-                                result = MongoFuncs.get_users_by_topic(db,topic)
-                                print(result)
-                            #have the serch user by name or tag but missing the privasity notification or the block feature
-                            pass
+                                results = MongoFuncs.get_users_by_topic(db,topic)
+                                for result in results:
+                                    print("-" * 40)
+                                    MongoFuncs.print_user(result)
+                                print("-" * 40)
                         elif option == 9:   #Too many arguments provided to bind()
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")

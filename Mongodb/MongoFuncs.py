@@ -86,8 +86,19 @@ def get_users_by_name(db, name):
                 "social_links": user.get("social_links"),
                 "topics_preferences": user.get("topics_preferences")
             })
-    print(result)
+    # print(result)
     return result
+
+def print_user(user):
+    print(f"Username: {user['username']}")
+    print(f"Name: {user['name']}")
+    print(f"Bio: {user['bio']}")
+    print("Social links:")
+    for link in user['social_links']:
+        print(f"    {link['platform']}: {link['url']}")
+    print("Interests")
+    for topic in user['topics_preferences']:
+        print(f"    {topic}")
 
 def get_users_by_topic(db, topic):
     return list(db.users.find({"topics_preferences": topic, "privacy_setting": "public"}, {"_id":1,"name":1,"username": 1, "bio": 1, "social_links": 1,"topics_preferences": 1}))
