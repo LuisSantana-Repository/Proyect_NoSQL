@@ -17,9 +17,10 @@
 - Unfollow (dgraph) done, requieres test and run
 - Bloquear (dgraph) done, requires test and run
 - Desbloquear (dgraph) done, requires test and run
-- Mensajes "privados" (dgraph)
+- Mensajes "privados" (dgraph) done, requires test and run
 - Ver amigos (dgraph) done, requires tenst and run
-- Descubrir posibles amigos (dgraph)
+- Descubrir posibles amigos (dgraph) done, requires tenst and run
+- User Log In (Cassandra) Done, require test and run
 
 4 - Acciones de analisis:
 - Posts con mas likes (Cassandra) Done, requires test
@@ -28,7 +29,7 @@
 - Topics mas usados (Cassandra) Done, requires test
 - Hashtags mas usados (Cassandra) Done, requires test
 - User growth (mongo) Done, requires test
-- Logins de usuarios (Cassandra)
+- Logins dailys (Cassandra) Donre, require test
 
 5 - Delete DONE
 6 - Exit

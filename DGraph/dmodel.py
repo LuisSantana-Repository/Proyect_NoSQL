@@ -405,6 +405,29 @@ def unblock(client, user, blocked_user):
         txn.commit()
         print(f"Unblocked User: {blocked_user} from User: {user}")
     finally:
-        # Clean up the transaction
         txn.discard()
+
+def get_relationships(client, user, depth=3):
+    query = """
+    query FriendsOfFriends($uid: string, $depth: int) {
+        FriendsOfFriends(func: uid($uid)) @recurse(depth: $depth) {
+            uid
+            username
+            follows
+        }
+    }
+    """
+    variables = {
+        "$uid": user,
+        "$depth": depth
+    }
+    txn = client.txn(read_only=True)
+    response = txn.query(query, variables=variables)
+    data = json.loads(response.json)
+    print(f"Firends of friends:\n{json.dumps(data, indent=2)}")
+    return data
+
+
+
+
 

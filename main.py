@@ -91,7 +91,8 @@ def print_second_menu():
         19: "Private Messages",
         20: "View Friends",
         21: "Discover Potential Friends",
-        22: "Logout"
+        22: "User Logins",
+        23: "Logout"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -104,7 +105,7 @@ def print_third_menu():
         4: "Most Used Topics",
         5: "Most Used Hashtags",
         6: "User Growth",
-        7: "User Logins",
+        7: "Daily Logins",
         8: "Return"
     }
     for key, value in options.items():
@@ -398,9 +399,16 @@ def main():
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
+                            print("Mensajes que has recivido")
+                            dmodel.get_RecivedMessages(client,dgraph_user_id)
+                            
+                            id = input("Escribe la Dgraph_id de la persona que le quiere mandar mensaje \n No tiene que ser de la personas anteriores")
+                            message = input("Contenido > ")
                             # Private Messages
-                            dmodel.createMessage
-                            dmodel.get_my_friends
+                            dmodel.createMessage(client,id,message,dgraph_user_id)
+                            
+                            print("Tus mensajes")
+                            dmodel.get_myMessages(client,dgraph_user_id)
                             pass
                         elif option == 20:   
                             if not mongo_user_id:
@@ -414,9 +422,15 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Discover Potential Friends
-                            # Missing query (cual missing? es el recursivo)
+                            recusive = int(input("select grade of recursive >  "))
+                            dmodel.get_relationships(client,dgraph_user_id,recusive)
                             pass
                         elif option == 22:
+                            if not mongo_user_id:
+                                print("Please, register or log in before selecting this option")
+                                continue
+                            cmodel.get_LoginUser(session,mongo_user_id)
+                        elif option == 23:
                             # Log out
                             mongo_user_id = None
                             dgraph_user_id = None
@@ -450,16 +464,7 @@ def main():
                             print(MongoFuncs.get_user_growth(db))
                             pass
                         elif option == 7:
-                            email = input("Enter email> ")
-                            password = input("Enter password> ")
-                            mongo_user_id = MongoFuncs.get_Log_In()
-                            if(mongo_user_id):
-                                #FAlta esto
-                                cmodel.get_LoginUser(session,mongo_user_id)
-                            # User Logins
-                            
-                            
-                            # falta opcion para user logins pero daily
+                            cmodel.get_dailyLogin(session)
                         elif option == 8:
                             # Return
                             break
