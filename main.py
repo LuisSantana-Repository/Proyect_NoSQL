@@ -118,9 +118,9 @@ def print_Profile_Opctions():
         1: "Change bio",
         2: "Change name",
         3: "Privacity settings",
-        4: "add lenguaje preferences",
-        5: "add Tag preferences",
-        6: "add social Links",
+        4: "Add lenguaje preferences",
+        5: "Add topic preferences",
+        6: "Add social Links",
         7: "Cancel"
     }
     for key, value in options.items():
@@ -154,6 +154,8 @@ def main():
     mongo_user_id = None
     dgraph_user_id = None
     while True:
+        print(f"Mongo id: {mongo_user_id}")
+        print(f"Dgraph id: {dgraph_user_id}")
         print_menu()
         option = int(input("Enter your choice: "))
         try:
@@ -179,7 +181,6 @@ def main():
                         bio = input("Enter Bio (opctional)> ")
                         mongo_user_id = MongoFuncs.add_user_registtration(db,username,email,password,bio,name)
                         dgraph_user_id = dmodel.createUser(client,username,mongo_user_id)
-                        print(dgraph_user_id)
                         ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                         cmodel.insert_logIn(session,mongo_user_id,ip)
                     elif option == 2:

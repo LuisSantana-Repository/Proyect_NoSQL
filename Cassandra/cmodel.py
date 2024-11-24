@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import datetime
+from datetime import datetime
 import json
 import logging
 import random
@@ -17,9 +17,9 @@ CREATE_KEYSPACE = """
 
 CREATE_POST_BY_USER = """
     CREATE TABLE IF NOT EXISTS Posts_by_user (
-    user_id UUID,
-    post_id UUID,
-    parent_id UUID,
+    user_id TEXT,
+    post_id TEXT,
+    parent_id TEXT,
     content TEXT,
     timestamp TIMESTAMP,
     tags SET<TEXT>,
@@ -32,9 +32,9 @@ CREATE_POST_BY_USER = """
 
 CREATE_POST_BY_TOPIC = """
     CREATE TABLE IF NOT EXISTS Posts_by_topic (
-    user_id UUID,
-    post_id UUID,
-    parent_id UUID,
+    user_id TEXT,
+    post_id TEXT,
+    parent_id TEXT,
     content TEXT,
     timestamp TIMESTAMP,
     tags SET<TEXT>,
@@ -46,9 +46,9 @@ CREATE_POST_BY_TOPIC = """
 
 CREATE_POST_BY_PARENT = """
     CREATE TABLE IF NOT EXISTS Posts_by_parent (
-    user_id UUID,
-    post_id UUID,
-    parent_id UUID,
+    user_id TEXT,
+    post_id TEXT,
+    parent_id TEXT,
     content TEXT,
     timestamp TIMESTAMP,
     tags SET<TEXT>,
@@ -60,21 +60,21 @@ CREATE_POST_BY_PARENT = """
 
 CREATE_POST_LIKES = """
     CREATE TABLE IF NOT EXISTS Post_likes_count (
-    post_id UUID PRIMARY KEY,
+    post_id TEXT PRIMARY KEY,
     likes_count COUNTER
     );
 """
 
 CREATE_COMMENTS_COUNT = """
     CREATE TABLE IF NOT EXISTS Post_comments_count (
-    post_id UUID PRIMARY KEY,
+    post_id TEXT PRIMARY KEY,
     comments_count COUNTER
     );
 """
 CREATE_POST_LIKES_ORDERED = """
     CREATE TABLE Post_likes_ordered (
     likes_count INT,
-    post_id UUID,
+    post_id TEXT,
     PRIMARY KEY (likes_count, post_id)
 );
 """
@@ -82,14 +82,14 @@ CREATE_POST_LIKES_ORDERED = """
 CREATE_POST_COMMENTS_ORDERED = """
 CREATE TABLE Post_comments_ordered (
     comments_count INT,
-    post_id UUID,
+    post_id TEXT,
     PRIMARY KEY (comments_count, post_id)
 );
 """
 
 CREATE_LOGIN_USER = """
     CREATE TABLE IF NOT EXISTS Login_by_user (
-    user_id UUID,
+    user_id TEXT,
     login_timestamp TIMESTAMP,
     ip_address TEXT,
     PRIMARY KEY (user_id, login_timestamp)
@@ -98,7 +98,7 @@ CREATE_LOGIN_USER = """
 
 CREATE_LOGIN_DATE = """
     CREATE TABLE IF NOT EXISTS Login_by_date (
-    user_id UUID,
+    user_id TEXT,
     login_timestamp TIMESTAMP,
     ip_address TEXT,
     PRIMARY KEY (login_timestamp)
@@ -107,10 +107,10 @@ CREATE_LOGIN_DATE = """
 
 CREATE_ACTIVITY_TABLE = """
     CREATE TABLE IF NOT EXISTS Activity (
-    user_id UUID,
+    user_id TEXT,
     activity_timestamp TIMESTAMP,
     action_type TEXT,
-    post_id UUID,
+    post_id TEXT,
     PRIMARY KEY (user_id, activity_timestamp)
     ) WITH CLUSTERING ORDER BY (activity_timestamp DESC);
 """
@@ -216,7 +216,7 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
     data.append((mongo_user_id, time, Action, post_id))
 
 def insert_logIn(session,user,ip):
-    timestamp = datetime.datetime.now()
+    timestamp = datetime.now()
     lbu_stmt = session.prepare("""
         INSERT INTO Login_by_user (user_id, login_timestamp, ip_address)
         VALUES (?, ?, ?)
@@ -226,7 +226,7 @@ def insert_logIn(session,user,ip):
         VALUES (?, ?, ?)
     """)
     # print(user)
-    user = uuid.UUID(user)
+    # user = uuid.TEXT(user)
     # print(user)
     session.execute(lbd_stmt, (timestamp, user, ip))
     session.execute(lbu_stmt, (user, timestamp, ip))
