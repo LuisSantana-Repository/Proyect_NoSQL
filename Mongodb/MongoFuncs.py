@@ -68,6 +68,7 @@ def get_users_by_name(db, name):
         {"username": {"$regex": name, "$options": "i"}},
         {"username": 1, "bio": 1, "social_links": 1, "privacy_setting": 1}
     )
+    users = list(users)
     result = []
     for user in users:
         if user.get("privacy_setting") == "private":
@@ -78,7 +79,7 @@ def get_users_by_name(db, name):
                 "bio": user.get("bio"),
                 "social_links": user.get("social_links")
             })
-    
+    print(result)
     return result
 
 def get_users_by_tag(db, tag):
@@ -194,3 +195,14 @@ def add_saved_post(db, user_id, post_id):
         {"$addToSet": {"saved_posts": post_id}}  # Add post_id to the saved_posts array if not already present
     )
     return result.modified_count
+
+
+def get_uid_by_username(db, username):
+    user = db.users.find_one(
+        {"username": username}, 
+        {"_id": 1}               
+    )
+    print(user)
+    if user:
+        return str(user["_id"])
+    return None

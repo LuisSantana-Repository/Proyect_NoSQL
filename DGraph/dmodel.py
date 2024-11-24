@@ -61,7 +61,6 @@ def createUser(client,username, mongo):
 
 def createMessage(client,receiver, mssage, sender):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
         p = {
             'set': [
@@ -72,7 +71,7 @@ def createMessage(client,receiver, mssage, sender):
                         'uid': '_:new_message',
                         'dgraph.type': 'Message',
                         'content': mssage,
-                        'timestamp': datetime.datetime.utcnow().isoformat(),
+                        'timestamp': datetime.now().isoformat(),
                         'receiver': {'uid': receiver}
                         }]
                 }
@@ -114,20 +113,9 @@ def sent_friend_request(client, user, friend):
 
 def reject_friend_request(client, user, friend):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
-        p = {
-            'delete': [
-                # User data
-                {
-                    'uid': user,
-                    'follow_request':[{
-                            'uid': friend
-                        }]
-                }
-            ]
-        }
-        response = txn.mutate(set_obj=p)
+        print(user,friend)
+        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
         commit_response = txn.commit()
         print(f"Commit Response: {commit_response}")
         print(f"UIDs: {response.uids}")
@@ -141,21 +129,12 @@ def accept_friend_request(client, user, friend):
     txn = client.txn()
     ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
-        delete_mutation = {
-            'delete': [
-                {
-                    'uid': user,
-                    'follow_request': [{'uid': friend}]
-                }
-            ]
-        }
-        txn.mutate(set_obj=delete_mutation)
-        
+        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
         set_mutation = {
             'set': [
                 {
                     'uid': user,
-                    'blocked': [{'uid': friend}]
+                    'follows': [{'uid': friend}]
                 },
                 {
                     'uid': friend,
@@ -164,34 +143,6 @@ def accept_friend_request(client, user, friend):
             ]
         }
         txn.mutate(set_obj=set_mutation)
-        
-        # p = {
-        #     'delete': [
-        #         # User data
-        #         {
-        #             'uid': user,
-        #             'follow_request':[{
-        #                     'uid': friend
-        #                 }]
-        #         }
-        #     ],
-        #     'set':
-        #         # User data
-        #         {
-        #             'uid': user,
-        #             'follows':[{
-        #                     'uid': friend
-        #                 }]
-        #         },
-        #     'set':
-        #         {
-        #             'uid': friend,
-        #             'follows':[{
-        #                     'uid': user
-        #                 }]
-        #         },
-        # }
-        # response = txn.mutate(set_obj=p)
         commit_response = txn.commit()
         print(f"Commit Response: {commit_response}")
     finally:
@@ -203,19 +154,8 @@ def unfollow_friend(client, user, friend):
     txn = client.txn()
     ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
-        mutation = {
-            'set': [
-                {
-                    'uid': user,
-                    'follow': [{'uid': friend}]
-                },
-                {
-                    'uid': friend,
-                    'follow': [{'uid': user}]
-                }
-            ]
-        }
-        txn.mutate(set_obj=mutation)
+        response = txn.mutate(del_nquads= f'<{user}> <follows> <{friend}> .')
+        commit_response = txn.mutate(del_nquads= f'<{friend}> <follows> <{user}> .')
         commit_response = txn.commit()
         print(f"Commit Response: {commit_response}")
     finally:
@@ -254,7 +194,8 @@ def get_user_uid_by_mongo(client, mongo_id):
     variables = {'$mongo': mongo_id}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    users = data.get('users', [])
+    users = data.get('user', [])
+    print(users)
     return users[0]['uid'] if users else None
 
 def get_my_friends(client, user):
@@ -354,8 +295,6 @@ def get_RecivedMessages(client, user):
 def get_SendFollowRequest(client, user):
     query ="""query MyFollowRequest ($uid: string) {
             MyFollowRequest (func: uid($uid)) {
-                uid
-                username
                 ~follow_request{
                     uid
                     username
@@ -393,21 +332,14 @@ def delete_all(client):
 def unblock(client, user, blocked_user):
     txn = client.txn()
     try:
-        mutation = {
-            'delete': [
-                {
-                    'uid': user,
-                    'blocked': [{'uid': blocked_user}]
-                }
-            ]
-        }
-        response = txn.mutate(set_obj=mutation)
+        txn.mutate(del_nquads= f'<{user}> <blocked> <{blocked_user}> .')
         txn.commit()
         print(f"Unblocked User: {blocked_user} from User: {user}")
     finally:
         txn.discard()
 
 def get_relationships(client, user, depth=3):
+    depth = str(depth)
     query = """
     query FriendsOfFriends($uid: string, $depth: int) {
         FriendsOfFriends(func: uid($uid)) @recurse(depth: $depth) {

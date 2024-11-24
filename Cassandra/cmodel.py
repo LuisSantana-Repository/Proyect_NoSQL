@@ -188,7 +188,7 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     #     session.execute(topic_update_stmt, (categoty))
     session.execute(Topics_stmt, (1, categoty))
     print("Post succesfully created")
-
+ 
 def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
     # Insert new post
     insert_Post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent)

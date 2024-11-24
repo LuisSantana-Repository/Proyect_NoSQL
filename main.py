@@ -195,7 +195,7 @@ def main():
                                 print(dgraph_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                             cmodel.insert_logIn(session,mongo_user_id,ip)
-                        elif option == 3: 
+                        elif option == 3: # change tag a topic, Lenguaje not working correctly
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -254,7 +254,7 @@ def main():
                             # Like Post
                             post = input("Post to like >")
                             cmodel.add_Like(session, post, mongo_user_id)
-                        elif option == 6:   
+                        elif option == 6:   #Check, dosent work
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -266,7 +266,7 @@ def main():
                             lenguage = choose_languages()
                             cmodel.comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
                             pass
-                        elif option == 7:   
+                        elif option == 7:   #Not programed
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -277,14 +277,15 @@ def main():
                                 #print(cmodel.)
                                 pass
                             pass
-                        elif option == 8:   
+                        elif option == 8:   #Tenemos que cambiar tags a topics, no funciona Name
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Search for Users by Name or Tags
                             search_type = input("Name or tag>")
                             if(search_type == "Name"):
-                                Name = input("Tell Me its Name >")
+                                Name = input("Tell Me its Name >").strip()
+                                print(Name)
                                 result = MongoFuncs.get_users_by_name(db,Name)
                                 print(result)
                             elif(search_type == "Tag"):
@@ -292,7 +293,7 @@ def main():
                                 MongoFuncs.get_users_by_tag(db,Tag)
                             #have the serch user by name or tag but missing the privasity notification or the block feature
                             pass
-                        elif option == 9:   
+                        elif option == 9:   #Too many arguments provided to bind()
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -302,14 +303,14 @@ def main():
                             cmodel.get_post_by_user(session,user)
                             #cmodel.get_post_by_user
                             pass
-                        elif option == 10:   
+                        elif option == 10:  #Not programed 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Discover Posts
                             #do cpsot by each ppreference anf do a join
                             pass
-                        elif option == 11:   
+                        elif option == 11:  # Correctly generates the report, need furder testing jsut in case 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -319,7 +320,7 @@ def main():
                             reason = input("Reason of report >")
                             MongoFuncs.add_report_post(db,mongo_user_id,Post_id,reason)
                             pass
-                        elif option == 12:   
+                        elif option == 12:  #las agrega al array, digo que funciona, faltan pruebas 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -332,59 +333,60 @@ def main():
                             
                             print(MongoFuncs.get_saved_posts(db,mongo_user_id))
                             pass
-                        elif option == 13:   
+                        elif option == 13:   #falta crear notificaciones, upsi
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Notifications
                             print(MongoFuncs.get_noficitation(db,mongo_user_id))
                             pass
-                        elif option == 14:   
+                        elif option == 14:   #funciona
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Send Follow Requests
-                            friend_id = input("user you want to send request> ")
-                            friend = dmodel.get_user_uid_by_mongo(friend_id)
+                            friend_id = input("username you want to send request> ").strip()
+                            friend_id = MongoFuncs.get_uid_by_username(db,friend_id)
+                            
+                            friend = dmodel.get_user_uid_by_mongo(client,friend_id)
                             dmodel.sent_friend_request(client,dgraph_user_id,friend)
                             pass
-                        elif option == 15:   
+                        elif option == 15:  #funciona 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Accept/Reject Follow Requests
-                            dmodel.get_SendFollowRequest(client,mongo_user_id)
+                            dmodel.get_SendFollowRequest(client,dgraph_user_id)
                             
-                            id = input("Give me the id of the user> ")
-                            Frined_dgraf_id = dmodel.get_user_uid_by_mongo(id)
+                            id = input("Give me the id of the user> ").strip()
                             
                             decition = input ("accept/deny >")
                             if(decition == "accept"):
-                                dmodel.accept_friend_request(client,dgraph_user_id,Frined_dgraf_id)
+                                dmodel.accept_friend_request(client,id,dgraph_user_id)
                             elif(decition == "deny"):
-                                dmodel.reject_friend_request(client,dgraph_user_id,Frined_dgraf_id)
+                                dmodel.reject_friend_request(client,id,dgraph_user_id)
                             pass
-                        elif option == 16:   
+                        elif option == 16:   #FUNCIONA
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Unfollow
-                            dmodel.get_my_friends(client,mongo_user_id)
+                            dmodel.get_my_friends(client,dgraph_user_id)
                             friend_id = input("Tell me the uid of friend >")
                             dmodel.unfollow_friend(client,dgraph_user_id,friend_id)
                             pass
-                        elif option == 17:   
+                        elif option == 17:  #funciona 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Block
-                            bloked_id = input("Give me the mongo_id of the user>")
-                            blocked_dgraph = dmodel.get_user_uid_by_mongo(bloked_id)
+                            bloked_username = input("Give me the username of the user>")
+                            blocked_dgraph = dmodel.get_user_uid_by_mongo(client,MongoFuncs.get_uid_by_username(db,bloked_username))
                             dmodel.block(client,dgraph_user_id,blocked_dgraph)
                             
                             dmodel.get_blocked_Users(client,dgraph_user_id)
                             pass
-                        elif option == 18:   
+                        elif option == 18:  #soy un cafro y funciona 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -395,14 +397,15 @@ def main():
                             dmodel.unblock(client,dgraph_user_id,unblock_id)
                             dmodel.get_blocked_Users(client,dgraph_user_id)
                             pass
-                        elif option == 19:   
+                        elif option == 19:   #funciona
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             print("Mensajes que has recivido")
                             dmodel.get_RecivedMessages(client,dgraph_user_id)
                             
-                            id = input("Escribe la Dgraph_id de la persona que le quiere mandar mensaje \n No tiene que ser de la personas anteriores")
+                            id = input("Escribe el username >")
+                            id = dmodel.get_user_uid_by_mongo(client,MongoFuncs.get_uid_by_username(db,id))
                             message = input("Contenido > ")
                             # Private Messages
                             dmodel.createMessage(client,id,message,dgraph_user_id)
@@ -410,14 +413,14 @@ def main():
                             print("Tus mensajes")
                             dmodel.get_myMessages(client,dgraph_user_id)
                             pass
-                        elif option == 20:   
+                        elif option == 20:   #funciona, creo, teste con solo un amigo
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Friends
                             dmodel.get_my_friends(client,dgraph_user_id)
                             pass
-                        elif option == 21:   
+                        elif option == 21:   #funciona, pero hace bucles
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -425,11 +428,15 @@ def main():
                             recusive = int(input("select grade of recursive >  "))
                             dmodel.get_relationships(client,dgraph_user_id,recusive)
                             pass
-                        elif option == 22:
+                        elif option == 22: #funciona
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
-                            cmodel.get_LoginUser(session,mongo_user_id)
+                            login_list = cmodel.get_LoginUser(session,mongo_user_id)
+                            for index, log in enumerate(login_list, start=1):
+                                print(f"{index}. {log}")
+
+                            
                         elif option == 23:
                             # Log out
                             mongo_user_id = None
