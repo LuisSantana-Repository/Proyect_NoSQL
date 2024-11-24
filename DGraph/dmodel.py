@@ -195,7 +195,7 @@ def get_user_uid_by_mongo(client, mongo_id):
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
     users = data.get('user', [])
-    print(users)
+    # print(users)
     return users[0]['uid'] if users else None
 
 def get_my_friends(client, user):

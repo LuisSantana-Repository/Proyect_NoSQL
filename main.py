@@ -156,8 +156,6 @@ def main():
     mongo_user_id = None
     dgraph_user_id = None
     while True:
-        print(f"Mongo id: {mongo_user_id}")
-        print(f"Dgraph id: {dgraph_user_id}")
         print_menu()
         option = int(input("Enter your choice: "))
         try:
@@ -172,6 +170,8 @@ def main():
                 pass
             elif option == 3:
                 while True:
+                    print(f"Mongo id: {mongo_user_id}")
+                    print(f"Dgraph id: {dgraph_user_id}")
                     print_second_menu()
                     option = int(input("Enter your choice: "))
                     try:
@@ -185,16 +185,17 @@ def main():
                             mongo_user_id = MongoFuncs.add_user_registtration(db,username,email,password,bio,name)
                             dgraph_user_id = dmodel.createUser(client,username,mongo_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
+                            cmodel.register_register(session,mongo_user_id,ip)
                             cmodel.insert_logIn(session,mongo_user_id,ip)
                         elif option == 2:
                             # Log In
                             email = input("Enter email> ")
                             password = input("Enter password> ")
                             mongo_user_id = MongoFuncs.get_Log_In(db,email,password)
-                            print(mongo_user_id)
+                            # print(mongo_user_id)
                             if(mongo_user_id):
                                 dgraph_user_id = dmodel.get_user_uid_by_mongo(client,mongo_user_id)
-                                print(dgraph_user_id)
+                                # print(dgraph_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                             cmodel.insert_logIn(session,mongo_user_id,ip)
                         elif option == 3:

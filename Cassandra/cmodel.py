@@ -218,6 +218,15 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
     Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
     session.execute(Activity_stmt, data[0])
 
+def register_register(session, user, ip):
+    # Logs
+    Action = "Register"
+    time = datetime.now()
+    data = []
+    data.append((user, time, Action))
+    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type) VALUES(?,?,?)")
+    session.execute(Activity_stmt, data[0])
+
 def insert_logIn(session,user,ip):
     timestamp = datetime.now()
     lbu_stmt = session.prepare("""
@@ -233,6 +242,14 @@ def insert_logIn(session,user,ip):
     # print(user)
     session.execute(lbd_stmt, (timestamp, user, ip))
     session.execute(lbu_stmt, (user, timestamp, ip))
+    
+    # Logs
+    Action = "Login"
+    time = datetime.now()
+    data = []
+    data.append((user, time, Action))
+    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type) VALUES(?,?,?)")
+    session.execute(Activity_stmt, data[0])
 
 
 def add_Like(session, post_id, user_id):
