@@ -3,7 +3,6 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Add/Update preferences (mongo)  la hice en ela anterior checar si lo podemos dejar asi mejor.
 - Postear (Cassandra) DONE, requires test
 - Comentar post (Cassandra) DONE, requires test
 - Like post (cassandra) Done, requires test
