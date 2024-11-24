@@ -1,7 +1,6 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Ver los posts de un usuario (mongo y Cassandra)
 - Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
 - Ver notificaciones (mongo) Done, requires test
 - User Log In (Cassandra) Done, require test and run
