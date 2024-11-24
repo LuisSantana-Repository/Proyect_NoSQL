@@ -3,7 +3,6 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Comentar post (Cassandra) DONE, requires test
 - Ver tu feed (Cassandra y dgraph) NO ES POSIBLE POR CONFIGURACION TENEMOS QUE CAMBIAR EL TAG_PREFERENCES A TOPIC PREFERENCES PROQUE NO TENEMOS UNA TABLA PARA TAG SOLO POR TOPICS
 - Ver los posts de un usuario (mongo y Cassandra)
 - Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
