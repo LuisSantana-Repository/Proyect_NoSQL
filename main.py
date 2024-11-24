@@ -46,11 +46,9 @@ def choose_languages():
     print("Available languages:")
     for i, language in enumerate(languages, start=1):
         print(f"{i}. {language}")
-
-    print("\nEnter the number of lengualle:")
     
     while True:
-        choices = int(input("Your selection: "))
+        choices = int(input("Select language: "))
         if 1 <= choices <= len(languages):
             return languages[choices - 1]
         else:
@@ -117,17 +115,16 @@ def print_Profile_Opctions():
     options = {
         1: "Change bio",
         2: "Change name",
-        3: "Privacity settings",
-        4: "Add lenguaje preferences",
+        3: "Privacy settings",
+        4: "Add lenguage",
         5: "Add topic preferences",
         6: "Add social Links",
-        7: "Remove a lengualle",
-        8: "Remoove a topic",
+        7: "Remove a language",
+        8: "Remove a topic",
         9: "Cancel"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
-
 
 def create_client_stub():
     return pydgraph.DgraphClientStub(DGRAPH_URI)
@@ -181,7 +178,7 @@ def main():
                             email = input("Enter email> ")
                             password = input("Enter password> ")
                             name = input("Enter Oficial Name> ")
-                            bio = input("Enter Bio (opctional)> ")
+                            bio = input("Enter Bio (optional)> ")
                             mongo_user_id = MongoFuncs.add_user_registtration(db,username,email,password,bio,name)
                             dgraph_user_id = dmodel.createUser(client,username,mongo_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
@@ -204,18 +201,18 @@ def main():
                                 continue
                             # Modify Profile Information
                             print_Profile_Opctions()
-                            inputs = int(input("select an option> "))
+                            inputs = int(input("Select an option> "))
                             if(inputs == 1):
                                 #bio Change
-                                bio = input("New bio data > ")
+                                bio = input("New bio data> ")
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
                             elif(inputs == 2):
                                 #name change
-                                name = input("chose new name > ")
+                                name = input("chose new name> ")
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
                             elif(inputs == 3):
                                 #private or public
-                                privacity = input("private or public >")
+                                privacity = input("private or public>")
                                 if(privacity == "private"):
                                     MongoFuncs.Set_privacy(db,mongo_user_id,"private")
                                 if(privacity == "public"):
@@ -229,7 +226,7 @@ def main():
                                 MongoFuncs.set_add_preferences(db,mongo_user_id,None,topic)
                             elif(inputs == 6):
                                 #social links
-                                plataform = input("Plataform Name >").strip()
+                                plataform = input("Plataform Name> ").strip()
                                 Url = input("Url>").strip()
                                 MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
                             elif(inputs == 7):
@@ -246,7 +243,7 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Post
-                            post = input("Write your post here >")
+                            post = input("Write your post here> ")
                             hashtags = get_hashtags()
                             categoty = choose_category()
                             lenguage = choose_languages()
@@ -257,7 +254,7 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Like Post
-                            post = input("Post to like >")
+                            post = input("Post to like> ")
                             cmodel.add_Like(session, post, mongo_user_id)
                             cmodel.insert_activity(session, mongo_user_id, "Liked a post", post)
                         elif option == 6:   
@@ -265,8 +262,8 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Comment Post
-                            parent = input("Post to comment >")
-                            post = input("Write your post here >")
+                            parent = input("Post to comment> ")
+                            post = input("Write your post here> ")
                             hashtags = get_hashtags()
                             categoty = choose_category()
                             lenguage = choose_languages()
@@ -291,9 +288,9 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Search for Users by Name or Tags
-                            search_type = input("Name or Topic>")
+                            search_type = input("Name or Topic> ")
                             if(search_type == "Name"):
-                                Name = input("Tell Me its Name >").strip()
+                                Name = input("Search by name> ").strip()
                                 # print(Name)
                                 results = MongoFuncs.get_users_by_name(db,Name)
                                 for result in results:
@@ -307,15 +304,18 @@ def main():
                                     print("-" * 40)
                                     MongoFuncs.print_user(result)
                                 print("-" * 40)
-                        elif option == 9:   #Too many arguments provided to bind()
+                        elif option == 9:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View a User's Posts
-                            #lists of users or decide myself // No, solo inserta el user id y muestra sus posts
-                            user = input("Give me the user_id>")
-                            cmodel.get_post_by_user(session,user)
-                            #cmodel.get_post_by_user
+                            user = input("Insert user's id> ")
+                            posts = cmodel.get_post_by_user(session, user)
+                            for post in posts:
+                                print("-" * 40) 
+                                cmodel.print_post(session, post)
+                                cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
+                            print("-" * 40)
                             pass
                         elif option == 10:  #Not programed 
                             if not mongo_user_id:

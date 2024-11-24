@@ -99,6 +99,7 @@ def print_user(user):
     print("Interests")
     for topic in user['topics_preferences']:
         print(f"    {topic}")
+    print(f"ID: {user['_id']}")
 
 def get_users_by_topic(db, topic):
     return list(db.users.find({"topics_preferences": topic, "privacy_setting": "public"}, {"_id":1,"name":1,"username": 1, "bio": 1, "social_links": 1,"topics_preferences": 1}))
