@@ -272,17 +272,20 @@ def main():
                             lenguage = choose_languages()
                             cmodel.comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
                             pass
-                        elif option == 7:   #Not programed
+                        elif option == 7:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Your Feed 
-                            lenguage = MongoFuncs.get_language_preferences(db,mongo_user_id)
-                            tags = MongoFuncs.get_tag_preferences(db,mongo_user_id)
-                            for tag in tags:
-                                #print(cmodel.)
-                                pass
-                            pass
+                            friends = dmodel.get_my_friends(client, dgraph_user_id)
+                            # print(friends)
+                            for friend in friends:
+                                posts = cmodel.get_post_by_user(session, friend['mongo'])
+                                for post in posts:
+                                    print("-" * 40) 
+                                    cmodel.print_post(post, friend['username'])
+                                    cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
+                                print("-" * 40)
                         elif option == 8:   #Imprime pero me gustaria cambair el formato
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")

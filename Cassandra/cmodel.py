@@ -260,8 +260,9 @@ def add_Like(session, post_id, user_id):
 
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")
-    rows = session.execute(query, (user_id))
-    return list(rows)
+    rows = session.execute(query, (user_id,))
+    # return list(rows)
+    return rows
 
 def get_post_by_topic(session, category):
     query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? ORDER BY timestamp DESC")
@@ -338,6 +339,12 @@ def get_top_10_commented_posts(session):
     print("Top 10 Most Commented Posts:")
     for i, row in enumerate(rows, start=1):
         print(f"{i}. Post ID: {row.post_id}, Comments: {row.comments_count}")
+
+def print_post(post, username): 
+    print(f"User: {username}")
+    print(f"Content: {post.content}")
+    print(f"Timestamp: {post.timestamp}")
+
 
 def create_keyspace(session, keyspace, replication_factor):
     session.execute(CREATE_KEYSPACE.format(keyspace, replication_factor))

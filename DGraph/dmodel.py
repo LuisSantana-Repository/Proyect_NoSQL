@@ -205,14 +205,15 @@ def get_my_friends(client, user):
                 follows{
                     uid
                     username
+                    mongo
                 }
             }
         }"""
     variables = {'$uid': user}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    print(f"Firends:\n{json.dumps(data, indent=2)}")
-    return data
+    # print(f"Firends:\n{json.dumps(data, indent=2)}")
+    return data['user'][0]['follows'] # Returns an array of {dgraph.uid, username}
 
 def get_blocked_Users(client, user):
     query ="""query BLockedUsers($uid: string) {
