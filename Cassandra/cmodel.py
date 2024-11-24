@@ -140,21 +140,22 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     Topics_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + ? WHERE topic = ?")
     Hastags_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + ? WHERE hashtag = ?")
     
-    time = datetime.now()
+    
     post_uid = str(uuid.uuid4())
     
     if(parrent is None):
         parrent = post_uid
-        # Insert Action
+        # Logs
         Action="Created a Post"
-        data = []
-        data.append((userUUID,time,Action,post_uid))
-        session.execute(Activity_stmt, data[0])
-
+        insert_activity(session, userUUID, Action, post_uid)
+    else:
+        Action="Commented a Post"
+        insert_activity(session, userUUID, Action, post_uid)
     print(f"Parent: {parrent}\nPost: {post_uid}")
 
     # Post inserts
     data = []
+    time = datetime.now()
     data.append((userUUID,post_uid,post,time,set(hashtags),categoty,lenguage,parrent))
     session.execute(pbu_stmt, data[0])
     session.execute(pbt_stmt, data[0])
@@ -188,9 +189,9 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     print("Post succesfully created")
     
 
-def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
+def comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent):
     # Insert new post
-    insert_Post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent)
+    insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
     
     # Obtain current count
     get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
@@ -209,9 +210,6 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
     insert_stmt = session.prepare("INSERT INTO Post_comments_ordered (comments_count, post_id) VALUES (?, ?)")
     session.execute(insert_stmt, (current_comments_count+1, parent))
 
-    # Logs
-    Action = "Commented on a post"
-    insert_activity(session, mongo_user_id, Action, post_id)
 
 def insert_activity(session, user, Action, post_id=None):
     # Logs
@@ -259,10 +257,6 @@ def add_Like(session, post_id, user_id):
     # Reinsert row
     insert_stmt = session.prepare("INSERT INTO Post_likes_ordered (likes_count, post_id) VALUES (?, ?)")
     session.execute(insert_stmt, (current_likes_count+1, post_id))
-
-    # Logs
-    Action="Liked a post"
-    insert_activity(session, user_id, Action, post_id)
 
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")

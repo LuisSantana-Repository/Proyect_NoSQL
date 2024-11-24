@@ -209,12 +209,10 @@ def main():
                                 #bio Change
                                 bio = input("New bio data > ")
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
-                                pass
                             elif(inputs == 2):
                                 #name change
                                 name = input("chose new name > ")
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
-                                pass
                             elif(inputs == 3):
                                 #private or public
                                 privacity = input("private or public >")
@@ -222,31 +220,27 @@ def main():
                                     MongoFuncs.Set_privacy(db,mongo_user_id,"private")
                                 if(privacity == "public"):
                                     MongoFuncs.Set_privacy(db,mongo_user_id,"public")
-                                pass
                             elif(inputs == 4):
                                 #lengualle
                                 lenguaje = choose_languages()
                                 MongoFuncs.set_add_preferences(db,mongo_user_id,lenguaje)
-                                pass
                             elif(inputs == 5):
                                 topic = choose_category()
                                 MongoFuncs.set_add_preferences(db,mongo_user_id,None,topic)
-                                pass
                             elif(inputs == 6):
                                 #social links
                                 plataform = input("Plataform Name >").strip()
                                 Url = input("Url>").strip()
                                 MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
-                                pass
                             elif(inputs == 7):
                                 lenguaje = choose_languages()
                                 MongoFuncs.set_remove_Preferences(db,mongo_user_id,lenguaje,None)
-                                pass
                             elif(inputs == 8):
                                 topic = choose_category()
                                 MongoFuncs.set_remove_Preferences(db,mongo_user_id,None,topic)
-                                pass
-                            pass
+                            else:
+                                continue
+                            cmodel.insert_activity(session, mongo_user_id, "Modified Profile Information")
                         elif option == 4:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -265,6 +259,7 @@ def main():
                             # Like Post
                             post = input("Post to like >")
                             cmodel.add_Like(session, post, mongo_user_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Liked a post", post)
                         elif option == 6:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
