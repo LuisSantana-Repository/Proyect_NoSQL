@@ -451,26 +451,26 @@ def main():
                     print_third_menu()
                     option = int(input("Enter your choice: "))
                     try:
-                        if option == 1:
+                        if option == 1:#error
                             # Posts with Most Likes
                             cmodel.get_top_10_liked_posts(session)
-                        elif option == 2:
+                        elif option == 2: #error
                             # Posts with Most Comments
                             cmodel.get_top_10_commented_posts(session)
-                        elif option == 3:
+                        elif option == 3: #regresa count, funciona creo
                             # Posts with Most Reports
                             print(MongoFuncs.get_reported_posts(db))
-                        elif option == 4:
+                        elif option == 4:#error
                             # Most Used Topics
                             print(cmodel.get_popularTopics(session))
-                        elif option == 5:
+                        elif option == 5: #error
                             # Most Used Hashtags
                             print(cmodel.get_popularHashtags(session))
-                        elif option == 6:
+                        elif option == 6: #funciona
                             # User Growth
                             print(MongoFuncs.get_user_growth(db))
                             pass
-                        elif option == 7:
+                        elif option == 7: #error
                             cmodel.get_dailyLogin(session)
                         elif option == 8:
                             # Return
