@@ -466,10 +466,10 @@ def main():
                     try:
                         if option == 1:#error
                             # Posts with Most Likes
-                            cmodel.get_top_10_liked_posts(session)
+                            cmodel.get_most_liked_posts(session)
                         elif option == 2: #error
                             # Posts with Most Comments
-                            cmodel.get_top_10_commented_posts(session)
+                            cmodel.get_most_commented_posts(session)
                         elif option == 3: #regresa count, funciona creo
                             # Posts with Most Reports
                             print(MongoFuncs.get_reported_posts(db))

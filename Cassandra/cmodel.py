@@ -72,21 +72,21 @@ CREATE_COMMENTS_COUNT = """
     );
 """
 
-CREATE_POST_LIKES_ORDERED = """
-    CREATE TABLE Post_likes_ordered (
-    likes_count INT,
-    post_id TEXT,
-    PRIMARY KEY (likes_count, post_id)
-);
-"""
+# CREATE_POST_LIKES_ORDERED = """
+#     CREATE TABLE Post_likes_ordered (
+#     likes_count INT,
+#     post_id TEXT,
+#     PRIMARY KEY (likes_count, post_id)
+# );
+# """
 
-CREATE_POST_COMMENTS_ORDERED = """
-CREATE TABLE Post_comments_ordered (
-    comments_count INT,
-    post_id TEXT,
-    PRIMARY KEY (comments_count, post_id)
-);
-"""
+# CREATE_POST_COMMENTS_ORDERED = """
+# CREATE TABLE Post_comments_ordered (
+#     comments_count INT,
+#     post_id TEXT,
+#     PRIMARY KEY (comments_count, post_id)
+# );
+# """
 
 CREATE_LOGIN_USER = """
     CREATE TABLE IF NOT EXISTS Login_by_user (
@@ -136,10 +136,8 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     pbp_stmt = session.prepare("INSERT INTO Posts_by_parent (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
     plc_stmt = session.prepare("UPDATE Post_likes_count SET likes_count = likes_count + ? WHERE post_id = ?")
     pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + ? WHERE post_id = ?")
-    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
     Topics_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + ? WHERE topic = ?")
     Hastags_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + ? WHERE hashtag = ?")
-    
     
     post_uid = str(uuid.uuid4())
     
@@ -193,22 +191,22 @@ def comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent):
     # Insert new post
     insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
     
-    # Obtain current count
-    get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
-    rows = session.execute(get_count_stmt, (parent,))
-    current_comments_count = rows[0].comments_count
+    # # Obtain current count
+    # get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
+    # rows = session.execute(get_count_stmt, (parent,))
+    # current_comments_count = rows[0].comments_count
 
-    # Delete old count from ordered table
-    delete_stmt = session.prepare("DELETE FROM Post_comments_ordered WHERE comments_count = ? AND post_id = ?")
-    session.execute(delete_stmt, (current_comments_count, parent))
+    # # Delete old count from ordered table
+    # delete_stmt = session.prepare("DELETE FROM Post_comments_ordered WHERE comments_count = ? AND post_id = ?")
+    # session.execute(delete_stmt, (current_comments_count, parent))
 
     # Increase counter
     pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + 1 WHERE post_id = ?")
     session.execute(pcc_stmt, (parent,))
 
-    # Reinsert row
-    insert_stmt = session.prepare("INSERT INTO Post_comments_ordered (comments_count, post_id) VALUES (?, ?)")
-    session.execute(insert_stmt, (current_comments_count+1, parent))
+    # # Reinsert row
+    # insert_stmt = session.prepare("INSERT INTO Post_comments_ordered (comments_count, post_id) VALUES (?, ?)")
+    # session.execute(insert_stmt, (current_comments_count+1, parent))
 
 
 def insert_activity(session, user, Action, post_id=None):
@@ -241,22 +239,22 @@ def insert_logIn(session,user,ip):
 
 
 def add_Like(session, post_id, user_id):
-    # Obtain current count
-    get_count_stmt = session.prepare("SELECT likes_count FROM Post_likes_count WHERE post_id = ?")
-    rows = session.execute(get_count_stmt, (post_id,))
-    current_likes_count = rows[0].likes_count
+    # # Obtain current count
+    # get_count_stmt = session.prepare("SELECT likes_count FROM Post_likes_count WHERE post_id = ?")
+    # rows = session.execute(get_count_stmt, (post_id,))
+    # current_likes_count = rows[0].likes_count
 
-    # Delete old count from ordered table
-    delete_stmt = session.prepare("DELETE FROM Post_likes_ordered WHERE likes_count = ? AND post_id = ?")
-    session.execute(delete_stmt, (current_likes_count, post_id))
+    # # Delete old count from ordered table
+    # delete_stmt = session.prepare("DELETE FROM Post_likes_ordered WHERE likes_count = ? AND post_id = ?")
+    # session.execute(delete_stmt, (current_likes_count, post_id))
 
     # Increase counter
     plc_stmt = session.prepare("UPDATE Post_likes_count SET likes_count = likes_count + 1 WHERE post_id = ?")
     session.execute(plc_stmt, (post_id,))
 
-    # Reinsert row
-    insert_stmt = session.prepare("INSERT INTO Post_likes_ordered (likes_count, post_id) VALUES (?, ?)")
-    session.execute(insert_stmt, (current_likes_count+1, post_id))
+    # # Reinsert row
+    # insert_stmt = session.prepare("INSERT INTO Post_likes_ordered (likes_count, post_id) VALUES (?, ?)")
+    # session.execute(insert_stmt, (current_likes_count+1, post_id))
 
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")
@@ -326,18 +324,38 @@ def get_popularHashtags(session, limit=10):
     rows = session.execute(query, (limit))
     return list(rows)
 
-def get_top_10_liked_posts(session):
-    query = "SELECT post_id, likes_count FROM Post_likes_ordered ORDER BY likes_count DESC LIMIT 10"
+def get_most_liked_posts(session, limit=10):
+    # query = "SELECT post_id, likes_count FROM Post_likes_ordered ORDER BY likes_count DESC LIMIT 10"
+    # rows = session.execute(query)
+    # print("Top 10 Most Liked Posts:")
+    # for i, row in enumerate(rows, start=1):
+    #     print(f"{i}. Post ID: {row.post_id}, Likes: {row.likes_count}")
+    query = "SELECT post_id, likes_count FROM Post_likes_count"
     rows = session.execute(query)
-    print("Top 10 Most Liked Posts:")
-    for i, row in enumerate(rows, start=1):
+    
+    # Sort rows by likes_count in descending order
+    sorted_rows = sorted(rows, key=lambda x: x.likes_count, reverse=True)
+    
+    # Print top 10 posts
+    print(f"Top {limit} Most Liked Posts:")
+    for i, row in enumerate(sorted_rows[:limit], start=1):
         print(f"{i}. Post ID: {row.post_id}, Likes: {row.likes_count}")
 
-def get_top_10_commented_posts(session):
-    query = "SELECT post_id, comments_count FROM Post_comments_ordered ORDER BY comments_count DESC LIMIT 10"
+def get_most_commented_posts(session, limit=10):
+    # query = "SELECT post_id, comments_count FROM Post_comments_ordered ORDER BY comments_count DESC LIMIT 10"
+    # rows = session.execute(query)
+    # print("Top 10 Most Commented Posts:")
+    # for i, row in enumerate(rows, start=1):
+    #     print(f"{i}. Post ID: {row.post_id}, Comments: {row.comments_count}")
+    query = "SELECT post_id, comments_count FROM Post_comments_count"
     rows = session.execute(query)
-    print("Top 10 Most Commented Posts:")
-    for i, row in enumerate(rows, start=1):
+    
+    # Sort rows by comments_count in descending order
+    sorted_rows = sorted(rows, key=lambda x: x.comments_count, reverse=True)
+    
+    # Print top 10 posts
+    print(f"Top {limit} Most Commented Posts:")
+    for i, row in enumerate(sorted_rows[:limit], start=1):
         print(f"{i}. Post ID: {row.post_id}, Comments: {row.comments_count}")
 
 def print_post(session, post, username=None): 
@@ -354,6 +372,7 @@ def print_post(session, post, username=None):
     print(f"Content: {post.content}")
     print(f"Comments: {current_comments_count}    Likes: {current_likes_count}")
     print(f"Timestamp: {post.timestamp}")
+    print(f"Post ID: {post.post_id}")
 
 def create_keyspace(session, keyspace, replication_factor):
     session.execute(CREATE_KEYSPACE.format(keyspace, replication_factor))
