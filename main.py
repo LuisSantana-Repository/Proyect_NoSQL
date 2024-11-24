@@ -316,7 +316,6 @@ def main():
                                 cmodel.print_post(session, post)
                                 cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
-                            pass
                         elif option == 10:  #Not programed 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
