@@ -160,12 +160,6 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     session.execute(plc_stmt, [0, post_uid])
     session.execute(pcc_stmt, [0, post_uid])
     
-    # Insert Action
-    Action="Created a Post"
-    data = []
-    data.append((userUUID,time,Action,post_uid))
-    session.execute(Activity_stmt, data[0])
-    
     # hashtags_check_insert=session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
     # hashtags_update_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + 1 WHERE hashtag = ?")
     # topic_check_insert =session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
@@ -188,6 +182,12 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     #     session.execute(topic_update_stmt, (categoty))
     session.execute(Topics_stmt, (1, categoty))
     print("Post succesfully created")
+    
+    # Insert Action
+    Action="Created a Post"
+    data = []
+    data.append((userUUID,time,Action,post_uid))
+    session.execute(Activity_stmt, data[0])
  
 def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
     # Insert new post
@@ -215,6 +215,8 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
     time = datetime.now()
     data = []
     data.append((mongo_user_id, time, Action, post_id))
+    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
+    session.execute(Activity_stmt, data[0])
 
 def insert_logIn(session,user,ip):
     timestamp = datetime.now()
@@ -256,6 +258,8 @@ def add_Like(session, post_id, user_id):
     time = datetime.now()
     data = []
     data.append((user_id,time,Action,post_id))
+    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
+    session.execute(Activity_stmt, data[0])
 
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")

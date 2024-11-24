@@ -264,7 +264,7 @@ def main():
                             # Like Post
                             post = input("Post to like >")
                             cmodel.add_Like(session, post, mongo_user_id)
-                        elif option == 6:   #Check, dosent work
+                        elif option == 6:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
