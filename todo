@@ -9,17 +9,7 @@
 - Buscar usuarios por nombre o tags (mongo) Done, requires test
 - Ver los posts de un usuario (mongo y Cassandra)
 - Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
-- Reportar posts (mongo) done, no corrido o testeado
-- Guardar posts (mongo) done, no corrido o testeado
 - Ver notificaciones (mongo) Done, requires test
-- Enviar follow requests (dgraph y mongo) Done, requires test and run
-- Aceptar/rechazar follow requests (dgraph y mongo) Done, requires test and run
-- Unfollow (dgraph) done, requieres test and run
-- Bloquear (dgraph) done, requires test and run
-- Desbloquear (dgraph) done, requires test and run
-- Mensajes "privados" (dgraph) done, requires test and run
-- Ver amigos (dgraph) done, requires tenst and run
-- Descubrir posibles amigos (dgraph) done, requires tenst and run
 - User Log In (Cassandra) Done, require test and run
 
 4 - Acciones de analisis:
@@ -28,7 +18,6 @@
 - Posts con mas reportes (Cassandra y mongo) Done, requires test
 - Topics mas usados (Cassandra) Done, requires test
 - Hashtags mas usados (Cassandra) Done, requires test
-- User growth (mongo) Done, requires test
 - Logins dailys (Cassandra) Donre, require test
 
 5 - Delete DONE

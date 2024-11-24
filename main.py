@@ -121,7 +121,9 @@ def print_Profile_Opctions():
         4: "Add lenguaje preferences",
         5: "Add topic preferences",
         6: "Add social Links",
-        7: "Cancel"
+        7: "Remove a lengualle",
+        8: "Remoove a topic",
+        9: "Cancel"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -195,7 +197,7 @@ def main():
                                 print(dgraph_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
                             cmodel.insert_logIn(session,mongo_user_id,ip)
-                        elif option == 3: # change tag a topic, Lenguaje not working correctly
+                        elif option == 3:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -226,14 +228,22 @@ def main():
                                 MongoFuncs.set_add_preferences(db,mongo_user_id,lenguaje)
                                 pass
                             elif(inputs == 5):
-                                tags = get_hashtags()
-                                MongoFuncs.set_add_preferences(db,mongo_user_id,None,tags)
+                                topic = choose_category()
+                                MongoFuncs.set_add_preferences(db,mongo_user_id,None,topic)
                                 pass
                             elif(inputs == 6):
                                 #social links
                                 plataform = input("Plataform Name >").strip()
                                 Url = input("Url>").strip()
                                 MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
+                                pass
+                            elif(inputs == 7):
+                                lenguaje = choose_languages()
+                                MongoFuncs.set_remove_Preferences(db,mongo_user_id,lenguaje,None)
+                                pass
+                            elif(inputs == 8):
+                                topic = choose_category()
+                                MongoFuncs.set_remove_Preferences(db,mongo_user_id,None,topic)
                                 pass
                             pass
                         elif option == 4:   
