@@ -71,6 +71,7 @@ CREATE_COMMENTS_COUNT = """
     comments_count COUNTER
     );
 """
+
 CREATE_POST_LIKES_ORDERED = """
     CREATE TABLE Post_likes_ordered (
     likes_count INT,
@@ -128,65 +129,65 @@ CREATE_HASHTAGS_TABLE = """
     );
 """
 
-
 def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     #asuming userUUID is goten from a mongo request or a server that has that user uuid
-    pbu_stmt = session.prepare("INSERT INTO Posts_by_user (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?)")
-    pbt_stmt = session.prepare("INSERT INTO Posts_by_topic (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?)")
-    pbp_stmt = session.prepare("INSERT INTO Posts_by_parent (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?)")
-    plc_stmt = session.prepare("INSERT INTO Post_likes_count(post_id,likes_count) VALUES(?,?)")
-    pcc_stmt = session.prepare("INSERT INTO Post_comments_count(post_id,comments_count) VALUES(?,?)")
+    pbu_stmt = session.prepare("INSERT INTO Posts_by_user (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
+    pbt_stmt = session.prepare("INSERT INTO Posts_by_topic (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
+    pbp_stmt = session.prepare("INSERT INTO Posts_by_parent (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
+    plc_stmt = session.prepare("UPDATE Post_likes_count SET likes_count = likes_count + ? WHERE post_id = ?")
+    pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + ? WHERE post_id = ?")
     Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
-    Topics_stmt = session.prepare("INSERT INTO Topics (topic, usage_count) VALUES(?, ?)")
-    Hastags_stmt = session.prepare("INSERT INTO Hashtags (hashtag, usage_count) VALUES(?, ?)")
+    Topics_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + ? WHERE topic = ?")
+    Hastags_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + ? WHERE hashtag = ?")
     
     post_uid = str(uuid.uuid4())
     if(parrent is None):
         parrent = post_uid
+    print(f"Parent: {parrent}\nPost: {post_uid}")
     if parrent != post_uid:  # This is a comment
         pcc_stmt = session.prepare("UPDATE Post_comments_count SET comments_count = comments_count + 1 WHERE post_id = ?")
         session.execute(pcc_stmt, (parrent))
+
+    # Post inserts
     time = datetime.now()
     data = []
     data.append((userUUID,post_uid,post,time,set(hashtags),categoty,lenguage,parrent))
-    #pbu,pbt,pbp
     session.execute(pbu_stmt, data[0])
     session.execute(pbt_stmt, data[0])
     session.execute(pbp_stmt, data[0])
     
+    # Comments and likes counters insertion
+    session.execute(plc_stmt, [0, post_uid])
+    session.execute(pcc_stmt, [0, post_uid])
     
-    
-    data = []
-    count = 0
-    data.append((post_uid,count))
-    #plc, pcc
-    session.execute(plc_stmt, data[0])
-    session.execute(pcc_stmt, data[0])
-    
+    # Insert Action
     Action="Created a Post"
     data = []
     data.append((userUUID,time,Action,post_uid))
-    #activity
     session.execute(Activity_stmt, data[0])
     
-    
-    hashtags_check_insert=session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
-    hashtags_update_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + 1 WHERE hashtag = ?")
-    topic_check_insert =session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
-    topic_update_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + 1 WHERE topic = ?")
+    # hashtags_check_insert=session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
+    # hashtags_update_stmt = session.prepare("UPDATE Hashtags SET usage_count = usage_count + 1 WHERE hashtag = ?")
+    # topic_check_insert =session.prepare("SELECT usage_count FROM Hashtags WHERE hashtag = ?")
+    # topic_update_stmt = session.prepare("UPDATE Topics SET usage_count = usage_count + 1 WHERE topic = ?")
 
+    # Hashtags update
     for hashtag in hashtags:
-            hashtag_check = session.execute(hashtags_check_insert, (hashtag))
-            if not hashtag_check.one():
-                session.execute(Hastags_stmt, (hashtag, 1))
-            else:
-                session.execute(hashtags_update_stmt, (hashtag,))
+        # hashtag_check = session.execute(hashtags_check_insert, (hashtag))
+        # if not hashtag_check.one():
+        #     session.execute(Hastags_stmt, (hashtag, 1))
+        # else:
+        #     session.execute(hashtags_update_stmt, (hashtag,))
+        session.execute(Hastags_stmt, (1, hashtag))
     
-    topic_check = session.execute(topic_check_insert, (categoty))
-    if not topic_check.one():
-        session.execute(Topics_stmt, (categoty, 1))
-    else:
-        session.execute(topic_update_stmt, (categoty))
+    # Topics update
+    # topic_check = session.execute(topic_check_insert, (categoty))
+    # if not topic_check.one():
+    #     session.execute(Topics_stmt, (categoty, 1))
+    # else:
+    #     session.execute(topic_update_stmt, (categoty))
+    session.execute(Topics_stmt, (1, categoty))
+    print("Post succesfully created")
 
 def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
     # Insert new post
