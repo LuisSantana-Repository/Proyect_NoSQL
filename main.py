@@ -283,7 +283,7 @@ def main():
                                 posts = cmodel.get_post_by_user(session, friend['mongo'])
                                 for post in posts:
                                     print("-" * 40) 
-                                    cmodel.print_post(post, friend['username'])
+                                    cmodel.print_post(session, post, friend['username'])
                                     cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                                 print("-" * 40)
                         elif option == 8:   #Imprime pero me gustaria cambair el formato

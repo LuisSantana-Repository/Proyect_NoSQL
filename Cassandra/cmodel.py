@@ -340,11 +340,19 @@ def get_top_10_commented_posts(session):
     for i, row in enumerate(rows, start=1):
         print(f"{i}. Post ID: {row.post_id}, Comments: {row.comments_count}")
 
-def print_post(post, username): 
+def print_post(session, post, username): 
+    # Get likes
+    get_count_stmt = session.prepare("SELECT likes_count FROM Post_likes_count WHERE post_id = ?")
+    rows = session.execute(get_count_stmt, (post.post_id,))
+    current_likes_count = rows[0].likes_count
+    # Get comments
+    get_count_stmt = session.prepare("SELECT comments_count FROM Post_comments_count WHERE post_id = ?")
+    rows = session.execute(get_count_stmt, (post.post_id,))
+    current_comments_count = rows[0].comments_count
     print(f"User: {username}")
     print(f"Content: {post.content}")
+    print(f"Comments: {current_comments_count}    Likes: {current_likes_count}")
     print(f"Timestamp: {post.timestamp}")
-
 
 def create_keyspace(session, keyspace, replication_factor):
     session.execute(CREATE_KEYSPACE.format(keyspace, replication_factor))
