@@ -1,5 +1,3 @@
-1 - Create schema DONE (probably needs update for cassandra to use str instrad of UUID)
-
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
@@ -16,5 +14,3 @@
 - Hashtags mas usados (Cassandra) Done, requires test
 - Logins dailys (Cassandra) Donre, require test
 
-5 - Delete DONE
-6 - Exit
