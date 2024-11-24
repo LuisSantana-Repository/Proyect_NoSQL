@@ -65,25 +65,32 @@ def get_common_preferences(db, limit=10):
 
 def get_users_by_name(db, name):
     users = db.users.find(
-        {"username": {"$regex": name, "$options": "i"}},
-        {"username": 1, "bio": 1, "social_links": 1, "privacy_setting": 1}
+        {"name": {"$regex": name, "$options": "i"}},
+        {"_id":1, "name": 1,"username": 1, "bio": 1, "social_links": 1, "privacy_setting": 1,"topics_preferences": 1}
     )
     users = list(users)
     result = []
     for user in users:
         if user.get("privacy_setting") == "private":
-            result.append({"username": user["username"]})  # Only include username for private users
+            result.append({
+                "_id": user.get("_id"),
+                "username": user["username"],
+                "name": user.get("name")
+                })
         else:
             result.append({
+                "_id": user.get("_id"),
                 "username": user["username"],
+                "name": user.get("name"),
                 "bio": user.get("bio"),
-                "social_links": user.get("social_links")
+                "social_links": user.get("social_links"),
+                "topics_preferences": user.get("topics_preferences")
             })
     print(result)
     return result
 
 def get_users_by_topic(db, topic):
-    return list(db.users.find({"topics_preferences": topic, "privacy_setting": "public"}, {"username": 1, "bio": 1, "social_links": 1,"topics_preferences": 1}))
+    return list(db.users.find({"topics_preferences": topic, "privacy_setting": "public"}, {"_id":1,"name":1,"username": 1, "bio": 1, "social_links": 1,"topics_preferences": 1}))
 
 def get_saved_posts(db, user_id):
     user = db.users.find_one(

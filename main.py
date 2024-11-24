@@ -288,20 +288,21 @@ def main():
                                 #print(cmodel.)
                                 pass
                             pass
-                        elif option == 8:   #Tenemos que cambiar tags a topics, no funciona Name
+                        elif option == 8:   #Imprime pero me gustaria cambair el formato
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Search for Users by Name or Tags
-                            search_type = input("Name or tag>")
+                            search_type = input("Name or Topic>")
                             if(search_type == "Name"):
                                 Name = input("Tell Me its Name >").strip()
                                 print(Name)
                                 result = MongoFuncs.get_users_by_name(db,Name)
                                 print(result)
-                            elif(search_type == "Tag"):
-                                Tag = input("Write a prefered Tag >")
-                                MongoFuncs.get_users_by_tag(db,Tag)
+                            elif(search_type == "Topic"):
+                                topic = choose_category()
+                                result = MongoFuncs.get_users_by_topic(db,topic)
+                                print(result)
                             #have the serch user by name or tag but missing the privasity notification or the block feature
                             pass
                         elif option == 9:   #Too many arguments provided to bind()
