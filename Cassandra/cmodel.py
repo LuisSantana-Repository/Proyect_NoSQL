@@ -188,7 +188,6 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     print("Post succesfully created")
     
 
- 
 def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent):
     # Insert new post
     insert_Post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent)
@@ -212,19 +211,14 @@ def comment_post(mongo_user_id,session,post_id,hashtags,categoty,lenguage,parent
 
     # Logs
     Action = "Commented on a post"
-    time = datetime.now()
-    data = []
-    data.append((mongo_user_id, time, Action, post_id))
-    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
-    session.execute(Activity_stmt, data[0])
+    insert_activity(session, mongo_user_id, Action, post_id)
 
-def register_register(session, user, ip):
+def insert_activity(session, user, Action, post_id=None):
     # Logs
-    Action = "Register"
     time = datetime.now()
     data = []
-    data.append((user, time, Action))
-    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type) VALUES(?,?,?)")
+    data.append((user, time, Action, post_id))
+    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
     session.execute(Activity_stmt, data[0])
 
 def insert_logIn(session,user,ip):
@@ -245,11 +239,7 @@ def insert_logIn(session,user,ip):
     
     # Logs
     Action = "Login"
-    time = datetime.now()
-    data = []
-    data.append((user, time, Action))
-    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type) VALUES(?,?,?)")
-    session.execute(Activity_stmt, data[0])
+    insert_activity(session, user, Action)
 
 
 def add_Like(session, post_id, user_id):
@@ -272,11 +262,7 @@ def add_Like(session, post_id, user_id):
 
     # Logs
     Action="Liked a post"
-    time = datetime.now()
-    data = []
-    data.append((user_id,time,Action,post_id))
-    Activity_stmt = session.prepare("INSERT INTO Activity (user_id, activity_timestamp, action_type, post_id) VALUES(?,?,?,?)")
-    session.execute(Activity_stmt, data[0])
+    insert_activity(session, user_id, Action, post_id)
 
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")

@@ -185,7 +185,7 @@ def main():
                             mongo_user_id = MongoFuncs.add_user_registtration(db,username,email,password,bio,name)
                             dgraph_user_id = dmodel.createUser(client,username,mongo_user_id)
                             ip = ".".join(map(str, (random.randint(0, 255) for _ in range(4))))
-                            cmodel.register_register(session,mongo_user_id,ip)
+                            cmodel.insert_activity(session,mongo_user_id,"Register")
                             cmodel.insert_logIn(session,mongo_user_id,ip)
                         elif option == 2:
                             # Log In
