@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from Mongodb.mmodel import User, Report, Notification
-from bson import ObjectId
 
 def add_user_registtration(db, username, email, password, bio=None, name=None):
     user = User(
@@ -31,7 +30,7 @@ def set_remove_Preferences(db, user_id, languages=None, tags=None):
     if tags:
         update["tag_preferences"] = {"$pull": {"$in": tags}}
     
-    result = db.users.update_one({"_id": ObjectId(user_id)}, update)
+    result = db.users.update_one({"_id": (user_id)}, update)
     return result.modified_count
 
 
@@ -87,20 +86,12 @@ def get_users_by_tag(db, tag):
 
 def get_saved_posts(db, user_id):
     user = db.users.find_one(
-        {"_id": ObjectId(user_id)},  # Match the user by their ObjectId
+        {"_id": (user_id)},  # Match the user by their 
         {"_id": 0, "saved_posts": 1}  # Only retrieve the saved_posts field
     )
     if user:
         return user.get("saved_posts", [])  # Return the saved_posts list or an empty list if not found
     return None
-
-def folow_request_acept_or_deny(db, user_id, requester_id, action):
-    if action == "accept":
-        db.users.update_one({"_id": ObjectId(user_id)}, {"$pull": {"follow_requests": requester_id}})
-    elif action == "deny":
-        result = db.users.update_one({"_id": ObjectId(user_id)}, {"$pull": {"follow_requests": requester_id}})
-        return result.modified_count
-    return 0
 
 def set_add_social_link(db, user_id, platform, url):
     result = db.users.update_one(
@@ -123,7 +114,7 @@ def get_user_growth(db):
 
 def set_user_add_interest(db, user_id, interests):
     result = db.users.update_one(
-        {"_id": ObjectId(user_id)},
+        {"_id": (user_id)},
         {"$addToSet": {"tag_preferences": {"$each": interests}}}
     )
     return result.modified_count
@@ -199,7 +190,7 @@ def get_language_preferences(db, user_id):
 
 def add_saved_post(db, user_id, post_id):
     result = db.users.update_one(
-        {"_id": user_id},  # Match the user by their ObjectId
+        {"_id": user_id},  # Match the user by their 
         {"$addToSet": {"saved_posts": post_id}}  # Add post_id to the saved_posts array if not already present
     )
     return result.modified_count

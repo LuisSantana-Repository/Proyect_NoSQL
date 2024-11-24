@@ -18,7 +18,6 @@ class User(BaseModel):
     social_links: List[dict] = Field(default_factory=list)  # [{"platform": "Twitter", "url": "https://..."}]
     saved_posts: List[str] = Field(default=[])
     registration_timestamp: datetime = Field(default_factory=datetime.now)
-    follow_requests: List[str] = Field(default=[])
 
     class Config:
         populate_by_name = True
@@ -39,7 +38,6 @@ class User(BaseModel):
                 ],
                 "saved_posts": ["post123", "post456"],
                 "registration_timestamp": "2024-11-01T10:00:00Z",
-                "follow_requests": ["user789"]
             }
         }
 

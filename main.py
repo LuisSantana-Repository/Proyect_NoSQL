@@ -313,27 +313,44 @@ def main():
                         pass
                     elif option == 15 and mongo_user_id:
                         # Send Follow Requests
-                        #no hay query para ahcer esto pero una ves alla
-                        friend = dmodel.get_user_uid_by_mongo()
+                        friend_id = input("user you want to send request> ")
+                        friend = dmodel.get_user_uid_by_mongo(friend_id)
                         dmodel.sent_friend_request(client,dgraph_user_id,friend)
                         pass
                     elif option == 16 and mongo_user_id:
                         # Accept/Reject Follow Requests
-                        MongoFuncs.folow_request_acept_or_deny
-                        dmodel.accept_friend_request()
-                        dmodel.reject_friend_request
+                        dmodel.get_SendFollowRequest(client,mongo_user_id)
+                        
+                        id = input("Give me the id of the user> ")
+                        Frined_dgraf_id = dmodel.get_user_uid_by_mongo(id)
+                        
+                        decition = input ("accept/deny >")
+                        if(decition == "accept"):
+                            dmodel.accept_friend_request(client,dgraph_user_id,Frined_dgraf_id)
+                        elif(decition == "deny"):
+                            dmodel.reject_friend_request(client,dgraph_user_id,Frined_dgraf_id)
                         pass
                     elif option == 17 and mongo_user_id:
                         # Unfollow
-                        dmodel.unfollow_friend
+                        dmodel.get_my_friends(client,mongo_user_id)
+                        friend_id = input("Tell me the uid of friend >")
+                        dmodel.unfollow_friend(client,dgraph_user_id,friend_id)
                         pass
                     elif option == 18 and mongo_user_id:
                         # Block
-                        dmodel.block
+                        bloked_id = input("Give me the mongo_id of the user>")
+                        blocked_dgraph = dmodel.get_user_uid_by_mongo(bloked_id)
+                        dmodel.block(client,dgraph_user_id,blocked_dgraph)
+                        
+                        dmodel.get_blocked_Users(client,dgraph_user_id)
                         pass
                     elif option == 19 and mongo_user_id:
                         # Unblock
-                        #not in dgraph relationship
+                        
+                        dmodel.get_blocked_Users(client,dgraph_user_id)
+                        unblock_id = input("Give me the uid of the user >")
+                        dmodel.unblock(client,dgraph_user_id,unblock_id)
+                        dmodel.get_blocked_Users(client,dgraph_user_id)
                         pass
                     elif option == 20 and mongo_user_id:
                         # Private Messages
@@ -342,7 +359,7 @@ def main():
                         pass
                     elif option == 21 and mongo_user_id:
                         # View Friends
-                        dmodel.get_my_friends
+                        dmodel.get_my_friends(client,dgraph_user_id)
                         pass
                     elif option == 22 and mongo_user_id:
                         # Discover Potential Friends

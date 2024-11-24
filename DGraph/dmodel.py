@@ -387,3 +387,24 @@ def get_RecieveFollowRequest(client, user):
 
 def delete_all(client):
     client.alter(pydgraph.Operation(drop_all=True))
+    
+    
+
+def unblock(client, user, blocked_user):
+    txn = client.txn()
+    try:
+        mutation = {
+            'delete': [
+                {
+                    'uid': user,
+                    'blocked': [{'uid': blocked_user}]
+                }
+            ]
+        }
+        response = txn.mutate(set_obj=mutation)
+        txn.commit()
+        print(f"Unblocked User: {blocked_user} from User: {user}")
+    finally:
+        # Clean up the transaction
+        txn.discard()
+

@@ -17,13 +17,13 @@
 - Reportar posts (mongo) done, no corrido o testeado
 - Guardar posts (mongo) done, no corrido o testeado
 - Ver notificaciones (mongo) Done, requires test
-- Enviar follow requests (dgraph y mongo) Done, requires test
-- Aceptar/rechazar follow requests (dgraph y mongo) Done, requires test
-- Unfollow (dgraph) 
-- Bloquear (dgraph)
-- Desbloquear (dgraph)
+- Enviar follow requests (dgraph y mongo) Done, requires test and run
+- Aceptar/rechazar follow requests (dgraph y mongo) Done, requires test and run
+- Unfollow (dgraph) done, requieres test and run
+- Bloquear (dgraph) done, requires test and run
+- Desbloquear (dgraph) done, requires test and run
 - Mensajes "privados" (dgraph)
-- Ver amigos (dgraph)
+- Ver amigos (dgraph) done, requires tenst and run
 - Descubrir posibles amigos (dgraph)
 
 4 - Acciones de analisis:
