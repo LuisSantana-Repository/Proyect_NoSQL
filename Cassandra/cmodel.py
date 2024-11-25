@@ -271,6 +271,12 @@ def add_Like(session, post_id, user_id):
     # insert_stmt = session.prepare("INSERT INTO Post_likes_ordered (likes_count, post_id) VALUES (?, ?)")
     # session.execute(insert_stmt, (current_likes_count+1, post_id))
 
+def get_post_by_post(session, post_id):
+    query = session.prepare("SELECT * FROM Posts_by_post WHERE post_id = ?")
+    rows = session.execute(query, (post_id,))
+    # return list(rows)
+    return rows[0]
+
 def get_post_by_user(session, user_id):
     query = session.prepare("SELECT * FROM Posts_by_user WHERE user_id = ? ORDER BY timestamp DESC")
     rows = session.execute(query, (user_id,))
@@ -281,7 +287,7 @@ def get_post_by_preferences(session, topic, language):
     query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? AND language = ? ORDER BY timestamp DESC")
     rows = session.execute(query, (topic, language))
     # return list(rows)
-    return list(rows)
+    return rows
 
 def get_comments_for_post(session, parent_id):
     query = session.prepare("SELECT * FROM Posts_by_parent WHERE parent_id = ?")
@@ -294,6 +300,16 @@ def get_LoginUser(session, user_id):
     """)
     rows = session.execute(query, (user_id,))
     return list(rows)
+
+def show_user_history(session, user_id):
+    query = session.prepare("SELECT * FROM activity WHERE user_id = ?")
+    rows = session.execute(query, (user_id,))
+    for row in rows:
+        print("-" * 40) 
+        print(f"{row.action_type}: {row.activity_timestamp}")
+        if row.post_id:
+            print(f"On: {row.post_id}")
+    print("-" * 40) 
 
 def get_dailyLogin(session):
     today = datetime.now().date()

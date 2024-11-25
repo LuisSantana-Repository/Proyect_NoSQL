@@ -90,7 +90,8 @@ def print_second_menu():
         20: "View Friends",
         21: "Discover Potential Friends",
         22: "User Logins",
-        23: "Logout"
+        23: "View History",
+        24: "Logout"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -453,10 +454,19 @@ def main():
                                 print(f"{index}. {log}")
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his logins")
                         elif option == 23:
+                            if not mongo_user_id:
+                                print("Please, register or log in before selecting this option")
+                                continue
+                            # View activity
+                            cmodel.show_user_history(session, mongo_user_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his history")
+                        elif option == 24:
+                            if not mongo_user_id:
+                                break
                             # Log out
+                            cmodel.insert_activity(session, mongo_user_id, "Logged out")
                             mongo_user_id = None
                             dgraph_user_id = None
-                            cmodel.insert_activity(session, mongo_user_id, "Logged out")
                             break
                         else:
                             print("Invalid option. Please select a valid number.")
