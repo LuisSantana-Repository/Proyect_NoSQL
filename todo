@@ -1,6 +1,7 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
+- Notificar a los usuarios cuando ocurre algo relacionado a ellos (mongo) (cuando le comentan o likean un post y cuando recibe una solicitud de amistad o mensaje)
 - Ver notificaciones (mongo) Done, requires test
 
 4 - Acciones de analisis:
