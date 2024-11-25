@@ -283,6 +283,13 @@ def get_post_by_user(session, user_id):
     # return list(rows)
     return rows
 
+def get_post_by_topic(session, category, leng, limit = 5):
+    query = session.prepare("""SELECT * FROM Posts_by_topic 
+                            WHERE category = ? AND language= ? 
+                            ORDER BY timestamp DESC
+                            LIMIT ?""")
+    rows = session.execute(query, (category,leng,limit))
+    return list(rows)
 def get_post_by_preferences(session, topic, language):
     query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? AND language = ? ORDER BY timestamp DESC")
     rows = session.execute(query, (topic, language))
@@ -296,7 +303,8 @@ def get_comments_for_post(session, parent_id):
 
 def get_LoginUser(session, user_id):
     query = session.prepare("""
-        SELECT * FROM Login_by_user WHERE user_id = ? ORDER BY login_timestamp DESC
+        SELECT * FROM Login_by_user 
+        WHERE user_id = ? ORDER BY login_timestamp DESC
     """)
     rows = session.execute(query, (user_id,))
     return list(rows)
