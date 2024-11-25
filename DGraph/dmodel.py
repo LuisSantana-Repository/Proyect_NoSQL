@@ -364,3 +364,23 @@ def get_relationships(client, user, depth=3):
 
 
 
+def get_mongo_by_uid(client, dgraph_uid):
+    query = """
+    query getMongoString($uid: string) {
+        user(func: uid($uid)) {
+            mongo
+        }
+    }
+    """
+    variables = {"$uid": dgraph_uid}
+
+    txn = client.txn(read_only=True)
+    try:
+        response = txn.query(query, variables=variables)
+        data = json.loads(response.json)
+        users = data.get("user", [])
+        if users:
+            return users[0].get("mongo")
+        return None
+    finally:
+        txn.discard()
