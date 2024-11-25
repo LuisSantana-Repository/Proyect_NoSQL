@@ -368,13 +368,11 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Send Follow Requests
-                            
                             friend_id = input("username you want to send request> ").strip()
                             friend_id = MongoFuncs.get_uid_by_username(db,friend_id)
                             MongoFuncs.add_notification(db,friend_id,"friend_request",)
                             friend = dmodel.get_user_uid_by_mongo(client,friend_id)
                             dmodel.sent_friend_request(client,dgraph_user_id,friend)
-                            
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,friend_id,"Friend_request",f"{myName} send you a friend request")
                             friend = dmodel.get_user_uid_by_mongo(client,friend_id)
@@ -406,11 +404,9 @@ def main():
                             dmodel.get_my_friends(client,dgraph_user_id)
                             friend_id = input("Tell me the uid of friend >")
                             dmodel.unfollow_friend(client,dgraph_user_id,friend_id)
-                            
                             mongo_friend = dmodel.get_mongo_by_uid(client,friend_id)
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_friend,"Friend_unfollow",f"{myName} and you, are no longer friends")
-
                             cmodel.insert_activity(session, mongo_user_id, "Unfollowed a user")
                         elif option == 17:  
                             if not mongo_user_id:
@@ -422,7 +418,6 @@ def main():
                             blocked_dgraph = dmodel.get_user_uid_by_mongo(client,blocked_id)
                             dmodel.block(client,dgraph_user_id,blocked_dgraph)
                             dmodel.get_blocked_Users(client,dgraph_user_id)
-                            
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,blocked_id,"Blovked",f"{myName} blocked you")
                             cmodel.insert_activity(session, mongo_user_id, "Blocked a user")
@@ -434,8 +429,7 @@ def main():
                             dmodel.get_blocked_Users(client,dgraph_user_id)
                             unblock_id = input("Give me the uid of the user >")
                             dmodel.unblock(client,dgraph_user_id,unblock_id)
-                            dmodel.get_blocked_Users(client,dgraph_user_id)
-                            
+                            dmodel.get_blocked_Users(client,dgraph_user_id)    
                             mongo_unblocked = dmodel.get_mongo_by_uid(client,unblock_id)
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_unblocked,"Unblocked",f"{myName} Unblocked you")
@@ -454,10 +448,8 @@ def main():
                             dmodel.createMessage(client,id,message,dgraph_user_id)
                             print("Tus mensajes")
                             dmodel.get_myMessages(client,dgraph_user_id)
-                            
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_id,"Message",f"{myName} Sended you a meesage")
-                            pass
                         elif option == 20:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
