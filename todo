@@ -1,7 +1,6 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
 - Ver notificaciones (mongo) Done, requires test
 
 4 - Acciones de analisis:

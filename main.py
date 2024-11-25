@@ -208,7 +208,7 @@ def main():
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
                             elif(inputs == 2):
                                 #name change
-                                name = input("chose new name> ")
+                                name = input("Chose new name> ")
                                 MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
                             elif(inputs == 3):
                                 #private or public
@@ -282,7 +282,7 @@ def main():
                                     print("-" * 40) 
                                     cmodel.print_post(session, post, friend['username'])
                                     cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
-                                print("-" * 40)
+                            print("-" * 40)
                         elif option == 8:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -310,19 +310,30 @@ def main():
                                 continue
                             # View a User's Posts
                             user = input("Insert user's id> ")
+                            print(f"{MongoFuncs.get_username_by_uid(db, user)} posts:")
                             posts = cmodel.get_post_by_user(session, user)
                             for post in posts:
                                 print("-" * 40) 
                                 cmodel.print_post(session, post)
                                 cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
-                        elif option == 10:  #Not programed 
+                        elif option == 10:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Discover Posts
-                            #do cpsot by each ppreference anf do a join
-                            pass
+                            topics = MongoFuncs.get_topics_preferences(db, mongo_user_id)
+                            languages = MongoFuncs.get_language_preferences(db, mongo_user_id)
+                            # Search and print posts with those languages and preferences
+                            for topic in topics:
+                                for language in languages:
+                                    posts = cmodel.get_post_by_preferences(session, topic, language)
+                                    for post in posts:
+                                        print("-" * 40) 
+                                        user = MongoFuncs.get_username_by_uid(db, post.user_id)
+                                        cmodel.print_post(session, post, user)
+                                        cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
+                            print("-" * 40)
                         elif option == 11:  # Correctly generates the report, need furder testing jsut in case 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")

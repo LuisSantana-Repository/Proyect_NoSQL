@@ -277,9 +277,10 @@ def get_post_by_user(session, user_id):
     # return list(rows)
     return rows
 
-def get_post_by_topic(session, category):
-    query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? ORDER BY timestamp DESC")
-    rows = session.execute(query, (category,))
+def get_post_by_preferences(session, topic, language):
+    query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? AND language = ? ORDER BY timestamp DESC")
+    rows = session.execute(query, (topic, language))
+    # return list(rows)
     return list(rows)
 
 def get_comments_for_post(session, parent_id):
@@ -385,6 +386,7 @@ def print_post(session, post, username=None):
     if username:
         print(f"User: {username}")
     print(f"Content: {post.content}")
+    print(f"Topic: {post.category}     Hashtags: {' '.join(post.tags)}")
     print(f"Comments: {current_comments_count}    Likes: {current_likes_count}")
     print(f"Timestamp: {post.timestamp}")
     print(f"Post ID: {post.post_id}")
