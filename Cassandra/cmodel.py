@@ -14,6 +14,19 @@ CREATE_KEYSPACE = """
         WITH replication = {{ 'class': 'SimpleStrategy', 'replication_factor': {} }}
 """
 
+CREATE_POST_BY_POST = """
+    CREATE TABLE IF NOT EXISTS Posts_by_post (
+    user_id TEXT,
+    post_id TEXT,
+    parent_id TEXT,
+    content TEXT,
+    timestamp TIMESTAMP,
+    tags SET<TEXT>,
+    category TEXT,
+    language TEXT,
+    PRIMARY KEY (post_id)
+    );
+"""
 
 CREATE_POST_BY_USER = """
     CREATE TABLE IF NOT EXISTS Posts_by_user (
@@ -132,6 +145,7 @@ CREATE_HASHTAGS_TABLE = """
 def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     #asuming userUUID is goten from a mongo request or a server that has that user uuid
     pbu_stmt = session.prepare("INSERT INTO Posts_by_user (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
+    pbpo_stmt = session.prepare("INSERT INTO Posts_by_post (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
     pbt_stmt = session.prepare("INSERT INTO Posts_by_topic (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
     pbp_stmt = session.prepare("INSERT INTO Posts_by_parent (user_id, post_id, content, timestamp, tags, category, language,parent_id) VALUES(?,?,?,?,?,?,?,?)")
     plc_stmt = session.prepare("UPDATE Post_likes_count SET likes_count = likes_count + ? WHERE post_id = ?")
@@ -156,8 +170,9 @@ def insert_Post(userUUID,session, post,hashtags,categoty,lenguage, parrent):
     time = datetime.now()
     data.append((userUUID,post_uid,post,time,set(hashtags),categoty,lenguage,parrent))
     session.execute(pbu_stmt, data[0])
-    session.execute(pbt_stmt, data[0])
     session.execute(pbp_stmt, data[0])
+    session.execute(pbt_stmt, data[0])
+    session.execute(pbpo_stmt, data[0])
     
     # Comments and likes counters insertion
     session.execute(plc_stmt, [0, post_uid])
@@ -269,6 +284,11 @@ def get_post_by_topic(session, category, leng, limit = 5):
                             LIMIT ?""")
     rows = session.execute(query, (category,leng,limit))
     return list(rows)
+def get_post_by_preferences(session, topic, language):
+    query = session.prepare("SELECT * FROM Posts_by_topic WHERE category = ? AND language = ? ORDER BY timestamp DESC")
+    rows = session.execute(query, (topic, language))
+    # return list(rows)
+    return list(rows)
 
 def get_comments_for_post(session, parent_id):
     query = session.prepare("SELECT * FROM Posts_by_parent WHERE parent_id = ?")
@@ -374,6 +394,7 @@ def print_post(session, post, username=None):
     if username:
         print(f"User: {username}")
     print(f"Content: {post.content}")
+    print(f"Topic: {post.category}     Hashtags: {' '.join(post.tags)}")
     print(f"Comments: {current_comments_count}    Likes: {current_likes_count}")
     print(f"Timestamp: {post.timestamp}")
     print(f"Post ID: {post.post_id}")
@@ -383,12 +404,13 @@ def create_keyspace(session, keyspace, replication_factor):
 
 def create_schema(session):
     session.execute(CREATE_POST_BY_USER)
+    session.execute(CREATE_POST_BY_POST)
     session.execute(CREATE_POST_BY_TOPIC)
     session.execute(CREATE_POST_BY_PARENT)
     session.execute(CREATE_POST_LIKES)
     session.execute(CREATE_COMMENTS_COUNT)
-    session.execute(CREATE_POST_LIKES_ORDERED)
-    session.execute(CREATE_POST_COMMENTS_ORDERED)
+    # session.execute(CREATE_POST_LIKES_ORDERED)
+    # session.execute(CREATE_POST_COMMENTS_ORDERED)
     session.execute(CREATE_LOGIN_USER)
     session.execute(CREATE_LOGIN_DATE)
     session.execute(CREATE_ACTIVITY_TABLE)

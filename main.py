@@ -121,7 +121,7 @@ def print_Profile_Opctions():
         6: "Add social Links",
         7: "Remove a language",
         8: "Remove a topic",
-        9: "Cancel"
+        9: "Return"
     }
     for key, value in options.items():
         print(f"{key} -- {value}")
@@ -200,44 +200,47 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Modify Profile Information
-                            print_Profile_Opctions()
-                            inputs = int(input("Select an option> "))
-                            if(inputs == 1):
-                                #bio Change
-                                bio = input("New bio data> ")
-                                MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
-                            elif(inputs == 2):
-                                #name change
-                                name = input("chose new name> ")
-                                MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
-                            elif(inputs == 3):
-                                #private or public
-                                privacity = input("private or public>")
-                                if(privacity == "private"):
-                                    MongoFuncs.Set_privacy(db,mongo_user_id,"private")
-                                if(privacity == "public"):
-                                    MongoFuncs.Set_privacy(db,mongo_user_id,"public")
-                            elif(inputs == 4):
-                                #lengualle
-                                lenguaje = choose_languages()
-                                MongoFuncs.set_add_preferences(db,mongo_user_id,lenguaje)
-                            elif(inputs == 5):
-                                topic = choose_category()
-                                MongoFuncs.set_add_preferences(db,mongo_user_id,None,topic)
-                            elif(inputs == 6):
-                                #social links
-                                plataform = input("Plataform Name> ").strip()
-                                Url = input("Url>").strip()
-                                MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
-                            elif(inputs == 7):
-                                lenguaje = choose_languages()
-                                MongoFuncs.set_remove_Preferences(db,mongo_user_id,lenguaje,None)
-                            elif(inputs == 8):
-                                topic = choose_category()
-                                MongoFuncs.set_remove_Preferences(db,mongo_user_id,None,topic)
-                            else:
-                                continue
-                            cmodel.insert_activity(session, mongo_user_id, "Modified Profile Information")
+                            while True:
+                                print_Profile_Opctions()
+                                inputs = int(input("Select an option> "))
+                                if(inputs == 1):
+                                    #bio Change
+                                    bio = input("New bio data> ")
+                                    MongoFuncs.set_update_profile_information(db,mongo_user_id,bio,None)
+                                elif(inputs == 2):
+                                    #name change
+                                    name = input("Chose new name> ")
+                                    MongoFuncs.set_update_profile_information(db,mongo_user_id,None,name)
+                                elif(inputs == 3):
+                                    #private or public
+                                    privacity = input("private or public>")
+                                    if(privacity == "private"):
+                                        MongoFuncs.Set_privacy(db,mongo_user_id,"private")
+                                    if(privacity == "public"):
+                                        MongoFuncs.Set_privacy(db,mongo_user_id,"public")
+                                elif(inputs == 4):
+                                    #lengualle
+                                    lenguaje = choose_languages()
+                                    MongoFuncs.set_add_preferences(db,mongo_user_id,lenguaje)
+                                elif(inputs == 5):
+                                    topic = choose_category()
+                                    MongoFuncs.set_add_preferences(db,mongo_user_id,None,topic)
+                                elif(inputs == 6):
+                                    #social links
+                                    plataform = input("Plataform Name> ").strip()
+                                    Url = input("Url>").strip()
+                                    MongoFuncs.set_add_social_link(db,mongo_user_id,plataform,Url)
+                                elif(inputs == 7):
+                                    lenguaje = choose_languages()
+                                    MongoFuncs.set_remove_Preferences(db,mongo_user_id,lenguaje,None)
+                                elif(inputs == 8):
+                                    topic = choose_category()
+                                    MongoFuncs.set_remove_Preferences(db,mongo_user_id,None,topic)
+                                elif(inputs == 9):
+                                    break
+                                else:
+                                    continue
+                                cmodel.insert_activity(session, mongo_user_id, "Modified Profile Information")
                         elif option == 4:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -282,7 +285,7 @@ def main():
                                     print("-" * 40) 
                                     cmodel.print_post(session, post, friend['username'])
                                     cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
-                                print("-" * 40)
+                            print("-" * 40)
                         elif option == 8:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -304,64 +307,62 @@ def main():
                                     print("-" * 40)
                                     MongoFuncs.print_user(result)
                                 print("-" * 40)
+                            cmodel.insert_activity(session, mongo_user_id, "Searched a user")
                         elif option == 9:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View a User's Posts
                             user = input("Insert user's id> ")
+                            print(f"{MongoFuncs.get_username_by_uid(db, user)} posts:")
                             posts = cmodel.get_post_by_user(session, user)
                             for post in posts:
                                 print("-" * 40) 
                                 cmodel.print_post(session, post)
                                 cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
-                        elif option == 10:  #Need test
+                        elif option == 10:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Discover Posts
-                            topics = MongoFuncs.get_topics_preferences(db,mongo_user_id)
-                            lenguaje = MongoFuncs.get_language_preferences(db,mongo_user_id)
-                            print(topics, lenguaje)
-                            
-                            feed = []
+                            topics = MongoFuncs.get_topics_preferences(db, mongo_user_id)
+                            languages = MongoFuncs.get_language_preferences(db, mongo_user_id)
                             for topic in topics:
-                                for len in lenguaje:
-                                    result = cmodel.get_post_by_topic(session,topic,len)
-                                    feed.append(feed)
-                            for topic in feed:
-                                cmodel.print_post(session,topic,)
-                            pass
-                        elif option == 11:
+                                for language in languages:
+                                    posts = cmodel.get_post_by_preferences(session, topic, language)
+                                    for post in posts:
+                                        print("-" * 40) 
+                                        user = MongoFuncs.get_username_by_uid(db, post.user_id)
+                                        cmodel.print_post(session, post, user)
+                                        cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
+                            print("-" * 40)
+                        elif option == 11:  # Correctly generates the report, need furder testing jsut in case 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
-                            Post_id = input("Post id>")
-                            reason = input("Reason of report >")
+                            # Report Posts
+                            Post_id = input("Post id> ")
+                            reason = input("Reason of report> ")
                             MongoFuncs.add_report_post(db,mongo_user_id,Post_id,reason)
-                            pass
-                        elif option == 12:
+                            cmodel.insert_activity(session, mongo_user_id, "Reported a post", Post_id)
+                        elif option == 12:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Save Posts
-                            Post_id = input("Post ID>")
-                            
-                            # input post id
+                            Post_id = input("Post ID> ")
                             MongoFuncs.add_saved_post(db,mongo_user_id,Post_id)
-                            #also a way to see my saved post is needed
-                            
                             print(MongoFuncs.get_saved_posts(db,mongo_user_id))
-                            pass
-                        elif option == 13:
+                            cmodel.insert_activity(session, mongo_user_id, "Saved a post", Post_id)
+                        elif option == 13:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Notifications
                             print(MongoFuncs.get_noficitation(db,mongo_user_id))
-                            pass
-                        elif option == 14: 
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his notifications")
+                        elif option == 14:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -375,26 +376,28 @@ def main():
                             
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,friend_id,"Friend_request",f"{myName} send you a friend request")
-                            pass
-                        elif option == 15: 
+                            friend = dmodel.get_user_uid_by_mongo(client,friend_id)
+                            dmodel.sent_friend_request(client,dgraph_user_id,friend)
+                            cmodel.insert_activity(session, mongo_user_id, "Sent a follow request")
+                        elif option == 15:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Accept/Reject Follow Requests
                             dmodel.get_SendFollowRequest(client,dgraph_user_id)
-                            
                             id = input("Give me the id of the user> ").strip()
-                            
                             decition = input ("accept/deny >")
                             if(decition == "accept"):
                                 dmodel.accept_friend_request(client,id,dgraph_user_id)
                                 myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                                 MongoFuncs.add_notification(db,id,"Friend_accept",f"{myName} accepted your a friend request")
+                                cmodel.insert_activity(session, mongo_user_id, "Accepted a request")
                             elif(decition == "deny"):
                                 dmodel.reject_friend_request(client,id,dgraph_user_id)
                                 MongoFuncs.add_notification(db,id,"Friend_deny",f"{myName} denied your friend request")
-                            pass
-                        elif option == 16: 
+                                dmodel.reject_friend_request(client,id,dgraph_user_id)
+                                cmodel.insert_activity(session, mongo_user_id, "Rejected a request")
+                        elif option == 16:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -406,8 +409,9 @@ def main():
                             mongo_friend = dmodel.get_mongo_by_uid(client,friend_id)
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_friend,"Friend_unfollow",f"{myName} and you, are no longer friends")
-                            pass
-                        elif option == 17:
+
+                            cmodel.insert_activity(session, mongo_user_id, "Unfollowed a user")
+                        elif option == 17:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
@@ -416,18 +420,16 @@ def main():
                             blocked_id = MongoFuncs.get_uid_by_username(db,bloked_username)
                             blocked_dgraph = dmodel.get_user_uid_by_mongo(client,blocked_id)
                             dmodel.block(client,dgraph_user_id,blocked_dgraph)
-                            
                             dmodel.get_blocked_Users(client,dgraph_user_id)
                             
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,blocked_id,"Blovked",f"{myName} blocked you")
-                            pass
-                        elif option == 18:
+                            cmodel.insert_activity(session, mongo_user_id, "Blocked a user")
+                        elif option == 18:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Unblock
-                            
                             dmodel.get_blocked_Users(client,dgraph_user_id)
                             unblock_id = input("Give me the uid of the user >")
                             dmodel.unblock(client,dgraph_user_id,unblock_id)
@@ -436,21 +438,19 @@ def main():
                             mongo_unblocked = dmodel.get_mongo_by_uid(client,unblock_id)
                             myName = MongoFuncs.get_username_by_id(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_unblocked,"Unblocked",f"{myName} Unblocked you")
-                            pass
-                        elif option == 19:
+                            cmodel.insert_activity(session, mongo_user_id, "Unblocked a user")
+                        elif option == 19:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
+                            # Private Messages
                             print("Mensajes que has recivido")
                             dmodel.get_RecivedMessages(client,dgraph_user_id)
-                            
                             id = input("Escribe el username >")
                             mongo_id = MongoFuncs.get_uid_by_username(db,id)
                             id = dmodel.get_user_uid_by_mongo(client,mongo_id)
                             message = input("Contenido > ")
-                            # Private Messages
                             dmodel.createMessage(client,id,message,dgraph_user_id)
-                            
                             print("Tus mensajes")
                             dmodel.get_myMessages(client,dgraph_user_id)
                             
@@ -463,28 +463,29 @@ def main():
                                 continue
                             # View Friends
                             dmodel.get_my_friends(client,dgraph_user_id)
-                            pass
-                        elif option == 21:
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his friends")
+                        elif option == 21:   #funciona, pero hace bucles
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Discover Potential Friends
                             recusive = int(input("select grade of recursive >  "))
                             dmodel.get_relationships(client,dgraph_user_id,recusive)
-                            pass
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his potential friends")
                         elif option == 22:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
+                            # View logins
                             login_list = cmodel.get_LoginUser(session,mongo_user_id)
                             for index, log in enumerate(login_list, start=1):
                                 print(f"{index}. {log}")
-
-                            
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his logins")
                         elif option == 23:
                             # Log out
                             mongo_user_id = None
                             dgraph_user_id = None
+                            cmodel.insert_activity(session, mongo_user_id, "Logged out")
                             break
                         else:
                             print("Invalid option. Please select a valid number.")
@@ -495,10 +496,10 @@ def main():
                     print_third_menu()
                     option = int(input("Enter your choice: "))
                     try:
-                        if option == 1:#error
+                        if option == 1:
                             # Posts with Most Likes
                             cmodel.get_most_liked_posts(session)
-                        elif option == 2: #error
+                        elif option == 2: 
                             # Posts with Most Comments
                             cmodel.get_most_commented_posts(session)
                         elif option == 3: #regresa count, funciona creo
@@ -510,7 +511,7 @@ def main():
                         elif option == 5: #error
                             # Most Used Hashtags
                             print(cmodel.get_popularHashtags(session))
-                        elif option == 6: #funciona
+                        elif option == 6: 
                             # User Growth
                             print(MongoFuncs.get_user_growth(db))
                             pass

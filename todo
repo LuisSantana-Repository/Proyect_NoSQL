@@ -1,8 +1,9 @@
 2 - Bulk insert (not necessary)
 
 3 - Acciones de usuario:
-- Descubrir posts (devolver unos cuantos basados en language y/o preferencias) (mongo y Cassandra) 
+- Notificar a los usuarios cuando ocurre algo relacionado a ellos (mongo) (cuando le comentan o likean un post y cuando recibe una solicitud de amistad o mensaje)
 - Ver notificaciones (mongo) Done, requires test
+- Opcion 19: Completar (Agregar logs, notificaciones, etc)
 
 4 - Acciones de analisis:
 - Posts con mas reportes (Cassandra y mongo) Done, requires test

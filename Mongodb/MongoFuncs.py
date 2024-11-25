@@ -226,9 +226,12 @@ def get_uid_by_username(db, username):
         return str(user["_id"])
     return None
 
-
-def get_username_by_id(db, user_id):
-    user = db.users.find_one({"_id": user_id}, {"username": 1})
+def get_username_by_uid(db, id):
+    user = db.users.find_one(
+        {"_id": id}, 
+        {"username": 1}               
+    )
+    # print(user)
     if user:
-        return user.get("username")
+        return str(user["username"])
     return None
