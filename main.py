@@ -354,12 +354,14 @@ def main():
                             Post_id = input("Post ID> ")
                             MongoFuncs.add_saved_post(db,mongo_user_id,Post_id)
                             print(MongoFuncs.get_saved_posts(db,mongo_user_id))
+                            cmodel.insert_activity(session, mongo_user_id, "Saved a post", Post_id)
                         elif option == 13:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Notifications
                             print(MongoFuncs.get_noficitation(db,mongo_user_id))
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his notifications")
                         elif option == 14:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -369,6 +371,7 @@ def main():
                             friend_id = MongoFuncs.get_uid_by_username(db,friend_id)
                             friend = dmodel.get_user_uid_by_mongo(client,friend_id)
                             dmodel.sent_friend_request(client,dgraph_user_id,friend)
+                            cmodel.insert_activity(session, mongo_user_id, "Sent a follow request")
                         elif option == 15:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -379,8 +382,10 @@ def main():
                             decition = input ("accept/deny >")
                             if(decition == "accept"):
                                 dmodel.accept_friend_request(client,id,dgraph_user_id)
+                                cmodel.insert_activity(session, mongo_user_id, "Accepted a request")
                             elif(decition == "deny"):
                                 dmodel.reject_friend_request(client,id,dgraph_user_id)
+                                cmodel.insert_activity(session, mongo_user_id, "Rejected a request")
                         elif option == 16:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -389,6 +394,7 @@ def main():
                             dmodel.get_my_friends(client,dgraph_user_id)
                             friend_id = input("Tell me the uid of friend >")
                             dmodel.unfollow_friend(client,dgraph_user_id,friend_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Unfollowed a user")
                         elif option == 17:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -398,6 +404,7 @@ def main():
                             blocked_dgraph = dmodel.get_user_uid_by_mongo(client,MongoFuncs.get_uid_by_username(db,bloked_username))
                             dmodel.block(client,dgraph_user_id,blocked_dgraph)
                             dmodel.get_blocked_Users(client,dgraph_user_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Blocked a user")
                         elif option == 18:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -407,6 +414,7 @@ def main():
                             unblock_id = input("Give me the uid of the user >")
                             dmodel.unblock(client,dgraph_user_id,unblock_id)
                             dmodel.get_blocked_Users(client,dgraph_user_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Unblocked a user")
                         elif option == 19:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -426,6 +434,7 @@ def main():
                                 continue
                             # View Friends
                             dmodel.get_my_friends(client,dgraph_user_id)
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his friends")
                         elif option == 21:   #funciona, pero hace bucles
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -433,17 +442,21 @@ def main():
                             # Discover Potential Friends
                             recusive = int(input("select grade of recursive >  "))
                             dmodel.get_relationships(client,dgraph_user_id,recusive)
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his potential friends")
                         elif option == 22:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
+                            # View logins
                             login_list = cmodel.get_LoginUser(session,mongo_user_id)
                             for index, log in enumerate(login_list, start=1):
                                 print(f"{index}. {log}")
+                            cmodel.insert_activity(session, mongo_user_id, "Viewed his logins")
                         elif option == 23:
                             # Log out
                             mongo_user_id = None
                             dgraph_user_id = None
+                            cmodel.insert_activity(session, mongo_user_id, "Logged out")
                             break
                         else:
                             print("Invalid option. Please select a valid number.")
