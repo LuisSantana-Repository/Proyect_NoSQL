@@ -176,6 +176,7 @@ def main():
                 pass
             elif option == 3:
                 while True:
+                    wait = 0
                     print(f"Mongo id: {mongo_user_id}")
                     print(f"Dgraph id: {dgraph_user_id}")
                     print_second_menu()
@@ -260,6 +261,7 @@ def main():
                             categoty = choose_category()
                             lenguage = choose_languages()
                             cmodel.insert_Post(mongo_user_id,session,post,hashtags,categoty,lenguage,None)
+                            wait = 1
                             pass
                         elif option == 5:   
                             if not mongo_user_id:
@@ -280,6 +282,7 @@ def main():
                             categoty = choose_category()
                             lenguage = choose_languages()
                             cmodel.comment_post(mongo_user_id,session,post,hashtags,categoty,lenguage,parent)
+                            wait = 1
                             pass
                         elif option == 7:
                             if not mongo_user_id:
@@ -295,6 +298,7 @@ def main():
                                     cmodel.print_post(session, post, friend['username'])
                                     cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
+                            wait = 1
                         elif option == 8:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -317,6 +321,7 @@ def main():
                                     MongoFuncs.print_user(result)
                                 print("-" * 40)
                             cmodel.insert_activity(session, mongo_user_id, "Searched a user")
+                            wait = 1
                         elif option == 9:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -330,6 +335,7 @@ def main():
                                 cmodel.print_post(session, post)
                                 cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
+                            wait = 1
                         elif option == 10:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -346,6 +352,7 @@ def main():
                                         cmodel.print_post(session, post, user)
                                         cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
                             print("-" * 40)
+                            wait = 1
                         elif option == 11:  # Correctly generates the report, need furder testing jsut in case 
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -371,6 +378,7 @@ def main():
                             # View Notifications
                             print(MongoFuncs.get_noficitation(db,mongo_user_id))
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his notifications")
+                            wait = 1
                         elif option == 14:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -482,6 +490,7 @@ def main():
                             # View Friends
                             print(dmodel.get_my_friends(client,dgraph_user_id))
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his friends")
+                            wait = 1
                         elif option == 21:   #funciona, pero hace bucles
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -490,6 +499,7 @@ def main():
                             recusive = int(input("select grade of recursive >  "))
                             dmodel.get_relationships(client,dgraph_user_id,recusive)
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his potential friends")
+                            wait = 1
                         elif option == 22:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -499,6 +509,7 @@ def main():
                             for index, log in enumerate(login_list, start=1):
                                 print(f"{index}. {log}")
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his logins")
+                            wait = 1
                         elif option == 23:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -506,6 +517,7 @@ def main():
                             # View activity
                             cmodel.show_user_history(session, mongo_user_id)
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his history")
+                            wait = 1
                         elif option == 24:
                             if not mongo_user_id:
                                 break
@@ -519,7 +531,8 @@ def main():
                         
                     except Exception as e:
                         print(f"An error occurred: {e}")
-                    input("Press a key to continue ...")
+                    if wait:
+                        input("Press a key to continue ...")
             elif option == 4:
                 while True:
                     print_third_menu()
