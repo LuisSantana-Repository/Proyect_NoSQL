@@ -369,14 +369,22 @@ def main():
                             # Save Posts
                             Post_id = input("Post ID> ")
                             MongoFuncs.add_saved_post(db,mongo_user_id,Post_id)
-                            print(MongoFuncs.get_saved_posts(db,mongo_user_id))
+                            print("Saved posts:")
+                            posts = MongoFuncs.get_saved_posts(db,mongo_user_id)
+                            for post in posts:
+                                print(f"Post ID: {post}")
                             cmodel.insert_activity(session, mongo_user_id, "Saved a post", Post_id)
-                        elif option == 13:  #ha funcionado por el momento 
+                            wait = 1
+                        elif option == 13:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Notifications
-                            print(MongoFuncs.get_noficitation(db,mongo_user_id))
+                            notifications = MongoFuncs.get_noficitation(db,mongo_user_id)
+                            for notification in notifications:
+                                print("-" * 40)
+                                print(f"{notification['type']}\n{notification['content']}\n{notification['timestamp']}")
+                            print("-" * 40)
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his notifications")
                             wait = 1
                         elif option == 14:  
