@@ -159,7 +159,9 @@ def get_reported_posts(db, limit=10):
         {"$sort": {"report_count": -1}},
         {"$limit": limit}
     ]
-    return list(db.reports.aggregate(pipeline))
+    reports = list(db.reports.aggregate(pipeline))
+    for report in reports:
+        print(f"Post ID: {report['_id']}, Reports: {report['report_count']}")
 
 
 def add_notification(db, user_id, notif_type, content):

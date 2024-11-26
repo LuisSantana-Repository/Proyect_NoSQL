@@ -528,7 +528,6 @@ def main():
                             break
                         else:
                             print("Invalid option. Please select a valid number.")
-                        
                     except Exception as e:
                         print(f"An error occurred: {e}")
                     if wait:
@@ -546,7 +545,7 @@ def main():
                             cmodel.get_most_commented_posts(session)
                         elif option == 3: #regresa count, funciona creo
                             # Posts with Most Reports
-                            print(MongoFuncs.get_reported_posts(db))
+                            MongoFuncs.get_reported_posts(db)
                         elif option == 4:#error
                             # Most Used Topics
                             cmodel.get_popularTopics(session)
