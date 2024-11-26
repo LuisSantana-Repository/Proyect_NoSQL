@@ -458,7 +458,7 @@ def main():
                             # Private Messages
                             print("Mensajes que has recivido")
                             dmodel.get_RecivedMessages(client,dgraph_user_id)
-                            
+                            cmodel.insert_activity(session, mongo_user_id, "Reviewed his inbox")
                             
                             id = input("Escribe el username >")
                             mongo_id = MongoFuncs.get_uid_by_username(db,id)
@@ -467,14 +467,14 @@ def main():
                             
                             message = input("Contenido > ")
                             dmodel.createMessage(client,id,message,dgraph_user_id)
-                            
+                            cmodel.insert_activity(session, mongo_user_id, "Sent a message")
                             
                             print("Tus mensajes")
                             dmodel.get_myMessages(client,dgraph_user_id)
                             
                             
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
-                            MongoFuncs.add_notification(db,mongo_id,"Message",f"{myName} Sended you a meesage")
+                            MongoFuncs.add_notification(db,mongo_id,"Message",f"{myName} Sent you a message")
                         elif option == 20:
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
