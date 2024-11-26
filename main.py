@@ -515,7 +515,7 @@ def main():
                             # View logins
                             login_list = cmodel.get_LoginUser(session,mongo_user_id)
                             for index, log in enumerate(login_list, start=1):
-                                print(f"{index}. {log}")
+                                print(f"{index}. {log.login_timestamp} with ip: {log.ip_address}")
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his logins")
                             wait = 1
                         elif option == 23:
