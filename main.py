@@ -536,10 +536,10 @@ def main():
                             print(MongoFuncs.get_reported_posts(db))
                         elif option == 4:#error
                             # Most Used Topics
-                            print(cmodel.get_popularTopics(session))
+                            cmodel.get_popularTopics(session)
                         elif option == 5: #error
                             # Most Used Hashtags
-                            print(cmodel.get_popularHashtags(session))
+                            cmodel.get_popularHashtags(session)
                         elif option == 6: 
                             # User Growth
                             print(MongoFuncs.get_user_growth(db))
