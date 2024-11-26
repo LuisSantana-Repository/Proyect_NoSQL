@@ -320,15 +320,23 @@ def show_user_history(session, user_id):
     print("-" * 40) 
 
 def get_dailyLogin(session):
-    today = datetime.now().date()
-    tomorrow = today + datetime.timedelta(days=1)
-    query = session.prepare("""
-        SELECT COUNT(DISTINCT user_id) AS daily_active_users
-        FROM Login_by_date
-        WHERE login_timestamp >= ? AND login_timestamp < ?
-    """)
-    result = session.execute(query, (today, tomorrow))
-    return result.one().daily_active_users
+    query = """
+        SELECT login_timestamp FROM Login_by_date;
+    """
+    rows = session.execute(query)
+    login_count_by_day = {}
+    for row in rows:
+        login_date = row.login_timestamp.date()  
+        if login_date not in login_count_by_day:
+            login_count_by_day[login_date] = 1
+        else:
+            login_count_by_day[login_date] += 1
+    sorted_login_counts = sorted(login_count_by_day.items(), key=lambda x: x[0], reverse=False)
+    print("Login Counts:")
+    for login_date, count in sorted_login_counts:
+        print(f"Date: {login_date}, Logins: {count}")
+
+
 
 
 def get_dailyActivityes(session, user_id):
