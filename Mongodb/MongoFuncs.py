@@ -130,7 +130,9 @@ def get_user_growth(db):
         },
         {"$sort": {"_id": 1}}
     ]
-    return list(db.users.aggregate(pipeline))
+    days = list(db.users.aggregate(pipeline))
+    for day in days:
+        print(f"Day: {day['_id']}, Users registered: {day['count']}")
 
 def set_user_add_interest(db, user_id, interests):
     result = db.users.update_one(

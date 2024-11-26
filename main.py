@@ -554,7 +554,7 @@ def main():
                             cmodel.get_popularHashtags(session)
                         elif option == 6: 
                             # User Growth
-                            print(MongoFuncs.get_user_growth(db))
+                            MongoFuncs.get_user_growth(db)
                             pass
                         elif option == 7: #error
                             cmodel.get_dailyLogin(session)
