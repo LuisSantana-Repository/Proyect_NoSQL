@@ -7,7 +7,5 @@
 
 4 - Acciones de analisis:
 - Posts con mas reportes (Cassandra y mongo) Done, requires test
-- Topics mas usados (Cassandra) Done, requires test
-- Hashtags mas usados (Cassandra) Done, requires test
 - Logins dailys (Cassandra) Donre, require test
 

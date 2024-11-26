@@ -344,25 +344,25 @@ def get_dailyActivityes(session, user_id):
     return list(rows)
 
 def get_popularTopics(session, limit=10):
-    query = session.prepare("""
-        SELECT topic, usage_count
-        FROM Topics
-        ORDER BY usage_count DESC
-        LIMIT ?
-    """)
-    rows = session.execute(query, (limit,))
-    return list(rows)
+    query = "SELECT topic, usage_count FROM Topics"
+    rows = session.execute(query)
+
+    sorted_rows = sorted(rows, key=lambda x: x.usage_count, reverse=True)
+
+    print(f"Top {limit} Most Popular Topics:")
+    for i, row in enumerate(sorted_rows[:limit], start=1):
+        print(f"{i}. Topic: {row.topic}, Usage Count: {row.usage_count}")
 
 
 def get_popularHashtags(session, limit=10):
-    query = session.prepare("""
-        SELECT hashtag, usage_count
-        FROM Hashtags
-        ORDER BY usage_count DESC
-        LIMIT ?
-    """)
-    rows = session.execute(query, (limit))
-    return list(rows)
+    query = "SELECT hashtag, usage_count FROM Hashtags"
+    rows = session.execute(query)
+
+    sorted_rows = sorted(rows, key=lambda x: x.usage_count, reverse=True)
+
+    print(f"Top {limit} Most Popular Hashtags:")
+    for i, row in enumerate(sorted_rows[:limit], start=1):
+        print(f"{i}. Hashtag: {row.hashtag}, Usage Count: {row.usage_count}")
 
 def get_most_liked_posts(session, limit=10):
     # query = "SELECT post_id, likes_count FROM Post_likes_ordered ORDER BY likes_count DESC LIMIT 10"
