@@ -79,8 +79,8 @@ def createMessage(client,receiver, mssage, sender):
         }
         response = txn.mutate(set_obj=p)
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
-        print(f"UIDs: {response.uids}")
+        #print(f"Commit Response: {commit_response}")
+        #print(f"UIDs: {response.uids}")
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.
@@ -103,8 +103,8 @@ def sent_friend_request(client, user, friend):
         }
         response = txn.mutate(set_obj=p)
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
-        print(f"UIDs: {response.uids}")
+        #print(f"Commit Response: {commit_response}")
+        #print(f"UIDs: {response.uids}")
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.
@@ -114,11 +114,11 @@ def sent_friend_request(client, user, friend):
 def reject_friend_request(client, user, friend):
     txn = client.txn()
     try:
-        print(user,friend)
+        #print(user,friend)
         response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
-        print(f"UIDs: {response.uids}")
+        #print(f"Commit Response: {commit_response}")
+        #print(f"UIDs: {response.uids}")
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.
@@ -127,7 +127,6 @@ def reject_friend_request(client, user, friend):
 
 def accept_friend_request(client, user, friend):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
         response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
         set_mutation = {
@@ -144,20 +143,18 @@ def accept_friend_request(client, user, friend):
         }
         txn.mutate(set_obj=set_mutation)
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
+        #print(f"Commit Response: {commit_response}")
     finally:
         # Clean up. 
-        # Calling this after txn.commit() is a no-op and hence safe.
         txn.discard()
 
 def unfollow_friend(client, user, friend):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
         response = txn.mutate(del_nquads= f'<{user}> <follows> <{friend}> .')
         commit_response = txn.mutate(del_nquads= f'<{friend}> <follows> <{user}> .')
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
+        #print(f"Commit Response: {commit_response}")
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.
@@ -178,7 +175,7 @@ def block(client, user, bloqued):
         }
         txn.mutate(set_obj=delete_mutation)
         commit_response = txn.commit()
-        print(f"Commit Response: {commit_response}")
+        #print(f"Commit Response: {commit_response}")
     finally:
         # Clean up. 
         # Calling this after txn.commit() is a no-op and hence safe.
@@ -201,7 +198,6 @@ def get_user_uid_by_mongo(client, mongo_id):
 def get_my_friends(client, user):
     query ="""query findFriends($uid: string) {
             user(func: uid($uid)) {
-                friend_count: count(follows)
                 follows{
                     uid
                     username
@@ -213,12 +209,31 @@ def get_my_friends(client, user):
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
     # print(f"Firends:\n{json.dumps(data, indent=2)}")
-    return data['user'][0]['follows'] # Returns an array of {dgraph.uid, username}
+    
+    if( data['user'] ):
+        #print(data)
+        return data['user'][0]['follows'] # Returns an array of {dgraph.uid, username}
+    else:
+        #print(None)
+        return None
+    
+def print_my_friends(friends):
+    if friends:
+        print("-" * 40)
+        for friend in friends:
+            uid = friend.get('uid')
+            username = friend.get('username')
+            print(f"UID: {uid}")
+            print(f"Username: {username}")
+            print("-" * 40) 
+    else:
+        print("No friends found.")
+        print("-" * 40)
+
 
 def get_blocked_Users(client, user):
     query ="""query BLockedUsers($uid: string) {
             Blocked(func: uid($uid)) {
-                uid
                 blocked {
                     uid
                     username
@@ -228,8 +243,23 @@ def get_blocked_Users(client, user):
     variables = {'$uid': user}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    print(f"Blocked:\n{json.dumps(data, indent=2)}")
+    #print(f"Blocked:\n{json.dumps(data, indent=2)}")
     return data
+
+
+def print_blocked_users(data):
+    print("Blocked Users:")
+    if data['Blocked']:
+        print("-" * 40)
+        for blocked_user in data['Blocked'][0]['blocked']:
+            uid = blocked_user.get('uid')
+            username = blocked_user.get('username')
+            print(f"UID: {uid}")
+            print(f"Username: {username}")
+            print("-" * 40)
+    else:
+        print("No blocked users found.")
+        print("-" * 40)
 
 def get_blockedBy(client, user):
     query ="""query blockedBy($uid: string) {
@@ -251,8 +281,6 @@ def get_blockedBy(client, user):
 def get_myMessages(client, user):
     query ="""query mySendedMessages ($uid: string) {
             mySendedMessages (func: uid($uid)) {
-                uid
-                username
                 sent_message {
                     uid
                     content
@@ -267,14 +295,34 @@ def get_myMessages(client, user):
     variables = {'$uid': user}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    print(f"My Messages:\n{json.dumps(data, indent=2)}")
+    #print(f"My Messages:\n{json.dumps(data, indent=2)}")
     return data
+
+def print_my_messages(data):
+    print("-" * 40)
+    print("My Sent Messages:")
+    #print(data)
+    if data['mySendedMessages']:
+        for message_entry in data['mySendedMessages'][0]['sent_message']:
+                #print(message_entry)
+                content = message_entry.get('content')
+                timestamp = message_entry.get('timestamp')
+                receiver = message_entry.get('receiver')
+                receiver_uid = receiver.get('uid')
+                receiver_username = receiver.get('username')
+
+                print(f"Reciver UID: {receiver_uid}")
+                print(f"To: {receiver_username}")
+                print(f"\tContent: {content}")
+                print(f"\tTimestamp: {timestamp}")
+                print("-" * 40) 
+    else:
+        print("No sent messages found.")
+        print("-" * 40)
 
 def get_RecivedMessages(client, user):
     query ="""query myRecivedMessages ($uid: string) {
             myRecivedMessages (func: uid($uid)) {
-                uid
-                username
                 ~receiver {
                     uid
                     content
@@ -289,8 +337,32 @@ def get_RecivedMessages(client, user):
     variables = {'$uid': user}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    print(f"My Recived Messages:\n{json.dumps(data, indent=2)}")
+    #print(f"My Recived Messages:\n{json.dumps(data, indent=2)}")
     return data
+
+def print_received_messages(data):
+    print("-" * 40)
+    print("Received Messages:")
+    if data['myRecivedMessages']:
+        print("-" * 40)
+        for message in data['myRecivedMessages'][0]['~receiver']:
+            content = message.get('content')
+            timestamp = message.get('timestamp')
+            # Sender information
+            sender = message.get('sender')[0]
+            sender_uid = sender.get('uid')
+            sender_username = sender.get('username')
+            
+            # Print message details
+            print(f"Sender UID: {sender_uid}")
+            print(f"Sender Username: {sender_username}")
+            print(f"\tContent: {content}")
+            print(f"\tTimestamp: {timestamp}")
+
+            print("-" * 40)  # Separator for each message
+    else:
+        print("No received messages found.")
+        print("-" * 40)
 
 
 def get_SendFollowRequest(client, user):
@@ -305,8 +377,23 @@ def get_SendFollowRequest(client, user):
     variables = {'$uid': user}
     res = client.txn(read_only=True).query(query, variables=variables)
     data = json.loads(res.json)
-    print(f"My Sended Follow Request:\n{json.dumps(data, indent=2)}")
+    #print(f"My Sended Follow Request:\n{json.dumps(data, indent=2)}")
     return data
+
+def print_follow_request(data):
+    if(data.get("MyFollowRequest")):
+        print("-" * 40)
+        for follow_request in data['MyFollowRequest'][0]['~follow_request']:
+            uid = follow_request.get('uid')
+            username = follow_request.get('username')
+            print(f"UID: {uid}")
+            print(f"Username: {username}")
+            print("-" * 40) 
+    else:
+        print("-" * 40)
+        print("No follow requests found.")
+        print("-" * 40)
+
 
 def get_RecieveFollowRequest(client, user):
     query ="""query PendingRequest ($uid: string) {

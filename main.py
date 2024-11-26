@@ -291,14 +291,20 @@ def main():
                             # View Your Feed 
                             friends = dmodel.get_my_friends(client, dgraph_user_id)
                             # print(friends)
-                            for friend in friends:
-                                posts = cmodel.get_post_by_user(session, friend['mongo'])
-                                for post in posts:
-                                    print("-" * 40) 
-                                    cmodel.print_post(session, post, friend['username'])
-                                    cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
-                            print("-" * 40)
-                            wait = 1
+                            if(friends == None):
+                                print("-" * 40)
+                                print("No friends, therefore No Feed")
+                                print("-" * 40)
+                                wait = 1
+                            else:
+                                for friend in friends:
+                                    posts = cmodel.get_post_by_user(session, friend['mongo'])
+                                    for post in posts:
+                                        print("-" * 40) 
+                                        cmodel.print_post(session, post, friend['username'])
+                                        cmodel.insert_activity(session, mongo_user_id, "Viewed a post", post.post_id)
+                                print("-" * 40)
+                                wait = 1
                         elif option == 8:   
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
@@ -392,9 +398,13 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Send Follow Requests
-                            friend_id = input("username you want to send request> ").strip()
-                            friend_id = MongoFuncs.get_uid_by_username(db,friend_id)
-                            
+                            username = input("username you want to send request> ").strip()
+                            friend_id = MongoFuncs.get_uid_by_username(db,username)
+                            print("Sending Invite to:")
+                            print("-" * 40) 
+                            print(f"DGraph Id: {friend_id}")
+                            print(f"\t User: {username}")
+                            print("-" * 40) 
                             friend = dmodel.get_user_uid_by_mongo(client,friend_id)
                             dmodel.sent_friend_request(client,dgraph_user_id,friend)
                             print("Dmodel success")
@@ -402,7 +412,7 @@ def main():
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
                             MongoFuncs.add_notification(db,friend_id,"Friend_request",str(f"{myName} send you a friend request"))
                             print("Mongo success")
-                            
+                            wait=1
             
                             cmodel.insert_activity(session, mongo_user_id, "Sent a follow request")
                         elif option == 15:  
@@ -410,16 +420,24 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Accept/Reject Follow Requests
-                            dmodel.get_SendFollowRequest(client,dgraph_user_id)
+                            data = dmodel.get_SendFollowRequest(client,dgraph_user_id)
+                            #print(data)
+                            dmodel.print_follow_request(data)
                             id = input("Give me the id of the user> ").strip()
                             decition = input ("accept/deny >")
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
                             mongo = dmodel.get_mongo_by_uid(client,id)
                             if(decition == "accept"):
+                                print("-" * 40) 
+                                print(f"Accepting invite of \n Dgraph_id: {id}")
+                                print("-" * 40) 
                                 dmodel.accept_friend_request(client,id,dgraph_user_id)
                                 MongoFuncs.add_notification(db,mongo,"Friend_accept",str(f"{myName} accepted your a friend request"))
                                 cmodel.insert_activity(session, mongo_user_id, "Accepted a request")
                             elif(decition == "deny"):
+                                print("-" * 40) 
+                                print(f"Rejecting invite of \n Dgraph_id: {id}")
+                                print("-" * 40) 
                                 dmodel.reject_friend_request(client,id,dgraph_user_id)
                                 MongoFuncs.add_notification(db,mongo,"Friend_deny",str(f"{myName} denied your friend request"))
                                 dmodel.reject_friend_request(client,id,dgraph_user_id)
@@ -429,7 +447,8 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Unfollow
-                            print(dmodel.get_my_friends(client,dgraph_user_id))
+                            data = dmodel.get_my_friends(client,dgraph_user_id)
+                            dmodel.print_my_friends(data)
                             friend_id = input("Tell me the uid of friend >")
                             dmodel.unfollow_friend(client,dgraph_user_id,friend_id)
                             
@@ -438,17 +457,30 @@ def main():
                             MongoFuncs.add_notification(db,mongo_friend,"Friend_unfollow",f"{myName} and you, are no longer friends")
                             
                             cmodel.insert_activity(session, mongo_user_id, "Unfollowed a user")
+                            
+                            print("Unfollow Succesfull")
+                            wait= 1
                         elif option == 17:  
                             if not mongo_user_id:
                                 print("Please, register or log in before selecting this option")
+                            
                                 continue
                             # Block
                             bloked_username = input("Give me the username of the user>")
                             blocked_id = MongoFuncs.get_uid_by_username(db,bloked_username)
                             blocked_dgraph = dmodel.get_user_uid_by_mongo(client,blocked_id)
-                            dmodel.block(client,dgraph_user_id,blocked_dgraph)
+                            print("-" * 40) 
+                            print(f"DGraph Id: {blocked_dgraph}")
+                            print(f"\t User: {bloked_username}")
+                            print("-" * 40) 
                             
-                            dmodel.get_blocked_Users(client,dgraph_user_id)
+                            
+                            
+                            dmodel.block(client,dgraph_user_id,blocked_dgraph)
+                            print("User blocked")
+                            data = dmodel.get_blocked_Users(client,dgraph_user_id)
+                            dmodel.print_blocked_users(data)
+                            wait = 1
                             
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
                             MongoFuncs.add_notification(db,blocked_id,"Blocked",str(f"{myName} blocked you"))
@@ -459,10 +491,18 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Unblock
-                            dmodel.get_blocked_Users(client,dgraph_user_id)
+                            data = dmodel.get_blocked_Users(client,dgraph_user_id)
+                            dmodel.print_blocked_users(data)
                             unblock_id = input("Give me the uid of the user >")
                             dmodel.unblock(client,dgraph_user_id,unblock_id)
-                            dmodel.get_blocked_Users(client,dgraph_user_id)    
+                            print("User unblocked")
+                            
+                            data = dmodel.get_blocked_Users(client,dgraph_user_id)
+                            dmodel.print_blocked_users(data)
+                            
+                            wait = 1
+                            
+                            
                             mongo_unblocked = dmodel.get_mongo_by_uid(client,unblock_id)
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_unblocked,"Unblocked",str(f"{myName} Unblocked you"))
@@ -472,8 +512,8 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # Private Messages
-                            print("Mensajes que has recivido")
-                            dmodel.get_RecivedMessages(client,dgraph_user_id)
+                            data = dmodel.get_RecivedMessages(client,dgraph_user_id)
+                            dmodel.print_received_messages(data)
                             cmodel.insert_activity(session, mongo_user_id, "Reviewed his inbox")
                             
                             id = input("Escribe el username >")
@@ -485,10 +525,11 @@ def main():
                             dmodel.createMessage(client,id,message,dgraph_user_id)
                             cmodel.insert_activity(session, mongo_user_id, "Sent a message")
                             
-                            print("Tus mensajes")
-                            dmodel.get_myMessages(client,dgraph_user_id)
                             
+                            data = dmodel.get_myMessages(client,dgraph_user_id)
+                            dmodel.print_my_messages(data)
                             
+                            wait = 1
                             myName = MongoFuncs.get_username_by_uid(db,mongo_user_id)
                             MongoFuncs.add_notification(db,mongo_id,"Message",f"{myName} Sent you a message")
                         elif option == 20:
@@ -496,7 +537,8 @@ def main():
                                 print("Please, register or log in before selecting this option")
                                 continue
                             # View Friends
-                            print(dmodel.get_my_friends(client,dgraph_user_id))
+                            data = dmodel.get_my_friends(client,dgraph_user_id)
+                            dmodel.print_my_friends(data)
                             cmodel.insert_activity(session, mongo_user_id, "Viewed his friends")
                             wait = 1
                         elif option == 21:   #funciona, pero hace bucles

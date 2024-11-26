@@ -225,7 +225,7 @@ def get_uid_by_username(db, username):
         {"username": username}, 
         {"_id": 1}               
     )
-    print(user)
+    #print(user)
     if user:
         return str(user["_id"])
     return None
