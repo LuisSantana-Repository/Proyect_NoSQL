@@ -401,12 +401,13 @@ def main():
                             # Send Follow Requests
                             username = input("username you want to send request> ").strip()
                             friend_id = MongoFuncs.get_uid_by_username(db,username)
+                            friend = dmodel.get_user_uid_by_mongo(client,friend_id)
                             print("Sending Invite to:")
                             print("-" * 40) 
-                            print(f"DGraph Id: {friend_id}")
+                            print(f"DGraph Id: {friend}")
                             print(f"\t User: {username}")
                             print("-" * 40) 
-                            friend = dmodel.get_user_uid_by_mongo(client,friend_id)
+                            
                             dmodel.sent_friend_request(client,dgraph_user_id,friend)
                             print("Dmodel success")
                             

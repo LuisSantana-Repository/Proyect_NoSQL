@@ -25,7 +25,7 @@ def set_schema(client):
     timestamp: datetime .
     username: string .
     follows: [uid] @reverse .
-    blocked: [uid] @reverse .
+    blocked: [uid] .
     sent_message: [uid] @reverse .
     follow_request: [uid] @reverse .
     mongo: string @index(hash) .
@@ -261,21 +261,6 @@ def print_blocked_users(data):
         print("No blocked users found.")
         print("-" * 40)
 
-def get_blockedBy(client, user):
-    query ="""query blockedBy($uid: string) {
-            blockedBy(func: uid($uid)) {
-                uid
-                ~blocked {
-                    uid
-                    username
-                }
-            }
-        }"""
-    variables = {'$uid': user}
-    res = client.txn(read_only=True).query(query, variables=variables)
-    data = json.loads(res.json)
-    print(f"Blocked:\n{json.dumps(data, indent=2)}")
-    return data
 
 
 def get_myMessages(client, user):

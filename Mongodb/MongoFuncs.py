@@ -2,13 +2,13 @@
 from Mongodb.mmodel import User, Report, Notification
 
 def set_indexes(db):
-    db.users.create_index([('email', 1), ('password', 1)])
+    #db.users.create_index([('email', 1), ('password', 1)]) no need since email is unique
     db.users.create_index([('username', 1)])
     db.users.create_index([('topics_preferences', 1)]) # unwind faster
     db.users.create_index([('registration_timestamp', 1)]) # aggregation faster
     db.notifications.create_index([("user_id",1)])
     db.users.create_index([('email', 1)], unique=True)
-    
+    db.reports.create_index(["reported_content_id",1])
     
     indexes = db.users.list_indexes()
     # Iterate through the indexes and print them
