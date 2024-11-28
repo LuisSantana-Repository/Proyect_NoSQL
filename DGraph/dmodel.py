@@ -23,7 +23,7 @@ def set_schema(client):
     receiver: uid @count @reverse .
     content: string .
     timestamp: datetime .
-    username: string @index(fulltext) .
+    username: string .
     follows: [uid] @reverse .
     blocked: [uid] @reverse .
     sent_message: [uid] @reverse .

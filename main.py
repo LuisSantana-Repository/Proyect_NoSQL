@@ -169,6 +169,7 @@ def main():
                 # Cassandra model
                 cmodel.create_schema(session)
                 # Mongo doesnt need to set the model
+                MongoFuncs.set_indexes(db)
                 # Dgraph model
                 dmodel.set_schema(client)
             elif option == 2:

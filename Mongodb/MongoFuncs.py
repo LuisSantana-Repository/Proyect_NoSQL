@@ -1,6 +1,23 @@
 #!/usr/bin/env python3
 from Mongodb.mmodel import User, Report, Notification
 
+def set_indexes(db):
+    db.users.create_index([('email', 1), ('password', 1)])
+    db.users.create_index([('username', 1)])
+    db.users.create_index([('topics_preferences', 1)]) # unwind faster
+    db.users.create_index([('registration_timestamp', 1)]) # aggregation faster
+    db.notifications.create_index([("user_id",1)])
+    db.users.create_index([('email', 1)], unique=True)
+    
+    
+    indexes = db.users.list_indexes()
+    # Iterate through the indexes and print them
+    for index in indexes:
+        print(index)
+
+
+
+
 def add_user_registtration(db, username, email, password, bio=None, name=None):
     user = User(
         username=username,
