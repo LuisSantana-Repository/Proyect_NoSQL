@@ -24,7 +24,7 @@ def set_schema(client):
     content: string .
     timestamp: datetime .
     username: string .
-    follows: [uid] @reverse .
+    follows: [uid] .
     blocked: [uid] .
     sent_message: [uid] @reverse .
     follow_request: [uid] @reverse .
@@ -379,23 +379,6 @@ def print_follow_request(data):
         print("No follow requests found.")
         print("-" * 40)
 
-
-def get_RecieveFollowRequest(client, user):
-    query ="""query PendingRequest ($uid: string) {
-            PendingRequest (func: uid($uid)) {
-                uid
-                username
-                follow_request{
-                    uid
-                    username
-                }
-            }
-        }"""
-    variables = {'$uid': user}
-    res = client.txn(read_only=True).query(query, variables=variables)
-    data = json.loads(res.json)
-    print(f"My Pending Follow Request:\n{json.dumps(data, indent=2)}")
-    return data
 
 def delete_all(client):
     client.alter(pydgraph.Operation(drop_all=True))

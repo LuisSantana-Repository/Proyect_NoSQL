@@ -12,10 +12,10 @@ class User(BaseModel):
     password: str = Field(...)
     bio: Optional[str] = Field(None)
     name: Optional[str] = Field(None)
-    privacy_setting: str = Field(default="public")  # 'public' or 'private'
+    privacy_setting: str = Field(default="public")
     language_preferences: List[str] = Field(default=[])
     topics_preferences: List[str] = Field(default=[])
-    social_links: List[dict] = Field(default_factory=list)  # [{"platform": "Twitter", "url": "https://..."}]
+    social_links: List[dict] = Field(default_factory=list)
     saved_posts: List[str] = Field(default=[])
     registration_timestamp: datetime = Field(default_factory=datetime.now)
 
@@ -67,8 +67,7 @@ class Notification(BaseModel):
     user_id: str = Field(...)
     type: str = Field(...) 
     content: str = Field(...)
-    timestamp: datetime = Field(default_factory=datetime.now) #default factory is able to make dafults but with variable data
-
+    timestamp: datetime = Field(default_factory=datetime.now)
     class Config:
         populate_by_name  = True
         json_schema_extra  = {

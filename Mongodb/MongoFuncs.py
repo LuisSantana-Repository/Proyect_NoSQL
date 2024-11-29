@@ -8,7 +8,7 @@ def set_indexes(db):
     db.users.create_index([('registration_timestamp', 1)]) # aggregation faster
     db.notifications.create_index([("user_id",1)])
     db.users.create_index([('email', 1)], unique=True)
-    db.reports.create_index(["reported_content_id",1])
+    db.reports.create_index([("reported_content_id",1)])
     
     indexes = db.users.list_indexes()
     # Iterate through the indexes and print them
@@ -26,7 +26,7 @@ def add_user_registtration(db, username, email, password, bio=None, name=None):
         bio=bio,
         name=name
     )
-    result = db.users.insert_one(user.dict(by_alias=True))
+    result = db.users.insert_one(user.model_dump(by_alias=True))
     return result.inserted_id
 
 def set_add_preferences(db, user_id, language=None, topic=None):
@@ -164,7 +164,7 @@ def add_report_post(db, reporting_user_id, reported_content_id, report_reason):
         reported_content_id=reported_content_id,
         report_reason=report_reason
     )
-    result = db.reports.insert_one(report.dict(by_alias=True))
+    result = db.reports.insert_one(report.model_dump(by_alias=True))
     return result.inserted_id
 
 def get_reported_posts(db, limit=10):
@@ -189,21 +189,19 @@ def add_notification(db, user_id, notif_type, content):
         type=notif_type,
         content=content
     )
-    result = db.notifications.insert_one(notification.dict(by_alias=True))
+    result = db.notifications.insert_one(notification.model_dump(by_alias=True)d)
     return result.inserted_id
 
 
 def get_noficitation(db, user_id):
     return list(db.notifications.find({"user_id": user_id}).sort("timestamp", -1).limit(10))
 
-def pop_noficitation(db, user_id):
-    result = db.notifications.find_one_and_delete({"user_id": user_id}, sort=[("timestamp", 1)])
-    return result
 
 def delete_all(db):
     try:
         collection_names = db.list_collection_names()
         for collection_name in collection_names:
+            db[collection_name].drop_indexes()
             db[collection_name].drop()
     except Exception as e:
         return
@@ -239,13 +237,13 @@ def add_saved_post(db, user_id, post_id):
 
 def get_uid_by_username(db, username):
     user = db.users.find_one(
-        {"username": username}, 
-        {"_id": 1}               
+        {"username": {"$regex": username, "$options": "i"}},
+        {"_id": 1}  # Only return the _id field
     )
-    #print(user)
     if user:
         return str(user["_id"])
     return None
+
 
 def get_username_by_uid(db, id):
     user = db.users.find_one(
