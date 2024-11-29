@@ -189,7 +189,7 @@ def add_notification(db, user_id, notif_type, content):
         type=notif_type,
         content=content
     )
-    result = db.notifications.insert_one(notification.model_dump(by_alias=True)d)
+    result = db.notifications.insert_one(notification.model_dump(by_alias=True))
     return result.inserted_id
 
 
