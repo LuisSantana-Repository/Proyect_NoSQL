@@ -518,7 +518,7 @@ def main():
                             dmodel.print_received_messages(data)
                             cmodel.insert_activity(session, mongo_user_id, "Reviewed his inbox")
                             
-                            id = input("Escribe el username >")
+                            id = input("Username >")
                             mongo_id = MongoFuncs.get_uid_by_username(db,id)
                             id = dmodel.get_user_uid_by_mongo(client,mongo_id)
                             
