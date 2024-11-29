@@ -57,7 +57,7 @@ def choose_languages():
 def print_menu():
     options = {
         1: "Set models",
-        2: "Load data",
+        2: "Load data (not developed due to time constraints)",
         3: "User actions",
         4: "Analysis actions",
         5: "Delete all data",

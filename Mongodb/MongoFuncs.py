@@ -12,8 +12,8 @@ def set_indexes(db):
     
     indexes = db.users.list_indexes()
     # Iterate through the indexes and print them
-    for index in indexes:
-        print(index)
+    # for index in indexes:
+    #     print(index)
 
 
 
