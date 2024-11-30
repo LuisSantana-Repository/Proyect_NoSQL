@@ -4,11 +4,9 @@ from Mongodb.mmodel import User, Report, Notification
 def set_indexes(db):
     #db.users.create_index([('email', 1), ('password', 1)]) no need since email is unique
     db.users.create_index([('username', 1)])
-    db.users.create_index([('topics_preferences', 1)]) # unwind faster
-    db.users.create_index([('registration_timestamp', 1)]) # aggregation faster
+    db.users.create_index([('name', 1)])
     db.notifications.create_index([("user_id",1)])
     db.users.create_index([('email', 1)], unique=True)
-    db.reports.create_index([("reported_content_id",1)])
     
     indexes = db.users.list_indexes()
     # Iterate through the indexes and print them
@@ -67,7 +65,7 @@ def Set_privacy(db, user_id, privacy_setting):
     return result.modified_count
 
 def get_common_preferences(db, limit=10):
-    pipeline = [
+    pipeline = [ # no index since it deconstructs the data and with that the index
         {"$unwind": "$topics_preferences"},
         {
             "$group": {
@@ -138,7 +136,7 @@ def set_add_social_link(db, user_id, platform, url):
     return result.modified_count
 
 def get_user_growth(db):
-    pipeline = [
+    pipeline = [ #group does not benefit from indexes
         {
             "$group": {
                 "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$registration_timestamp"}},
@@ -151,12 +149,6 @@ def get_user_growth(db):
     for day in days:
         print(f"Day: {day['_id']}, Users registered: {day['count']}")
 
-def set_user_add_interest(db, user_id, interests):
-    result = db.users.update_one(
-        {"_id": (user_id)},
-        {"$addToSet": {"topics_preferences": {"$each": interests}}}
-    )
-    return result.modified_count
 
 def add_report_post(db, reporting_user_id, reported_content_id, report_reason):
     report = Report(

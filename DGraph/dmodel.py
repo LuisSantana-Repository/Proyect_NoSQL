@@ -20,7 +20,7 @@ def set_schema(client):
     timestamp
     receiver
     }
-    receiver: uid @count @reverse .
+    receiver: uid @reverse .
     content: string .
     timestamp: datetime .
     username: string .
@@ -54,8 +54,6 @@ def createUser(client,username, mongo):
         #print(f"UIDs: {response.uids}")
         return assigned_uid
     finally:
-        # Clean up. 
-        # Calling this after txn.commit() is a no-op and hence safe.
         txn.discard()
 
 
@@ -82,13 +80,10 @@ def createMessage(client,receiver, mssage, sender):
         #print(f"Commit Response: {commit_response}")
         #print(f"UIDs: {response.uids}")
     finally:
-        # Clean up. 
-        # Calling this after txn.commit() is a no-op and hence safe.
         txn.discard()
 
 def sent_friend_request(client, user, friend):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
     try:
         p = {
             'set': [
@@ -115,7 +110,7 @@ def reject_friend_request(client, user, friend):
     txn = client.txn()
     try:
         #print(user,friend)
-        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
+        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') 
         commit_response = txn.commit()
         #print(f"Commit Response: {commit_response}")
         #print(f"UIDs: {response.uids}")
@@ -128,7 +123,7 @@ def reject_friend_request(client, user, friend):
 def accept_friend_request(client, user, friend):
     txn = client.txn()
     try:
-        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .') #NOSABES LA CANTIDAD DE DOCUMENTCION QUE TUVE QUE HACER PORQUE NO FUNCIONABA
+        response = txn.mutate(del_nquads= f'<{user}> <follow_request> <{friend}> .')
         set_mutation = {
             'set': [
                 {
@@ -163,7 +158,7 @@ def unfollow_friend(client, user, friend):
 
 def block(client, user, bloqued):
     txn = client.txn()
-    ######TODAVIA NO SE SABE SI SE UTILIZARA UID OF MONGOUID TONSES DEJO LA FUNCION POR SI ACASO ACA ABAJO
+    
     try:
         delete_mutation = {
             'set': [
